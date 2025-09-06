@@ -1,0 +1,57 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Barbearia API",
+  "dateExported": "2025-09-05T00:00:00.000Z",
+  "requests": [
+    {
+      "_id": "1",
+      "name": "Criar Barbeiro",
+      "method": "POST",
+      "url": "http://localhost:3000/api/barbers",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"João Barbeiro\",\n  \"email\": \"joao@barbearia.com\",\n  \"phone\": \"11999999999\",\n  \"cpf\": \"12345678901\",\n  \"role\": \"BARBER\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "2",
+      "name": "Listar Barbeiros",
+      "method": "GET",
+      "url": "http://localhost:3000/api/barbers"
+    },
+    {
+      "_id": "3",
+      "name": "Buscar Barbeiro por ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/barbers/{id}"
+    },
+    {
+      "_id": "4",
+      "name": "Atualizar Barbeiro",
+      "method": "PUT",
+      "url": "http://localhost:3000/api/barbers/{id}",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"João Atualizado\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "5",
+      "name": "Deletar Barbeiro",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/barbers/{id}"
+    }
+  ]
+}

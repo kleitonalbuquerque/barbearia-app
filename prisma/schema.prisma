@@ -1,0 +1,128 @@
+// Prisma schema for barbearia-app
+// Models: User, Client, ServiceType, Appointment, AppointmentItem, Payment, AuditLog
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String
+  cpf       String?  @unique
+  cnpj      String?  @unique
+  role      Role
+  status    Status   @default(ACTIVE)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  appointments Appointment[] @relation("BarberAppointments")
+  auditLogs  AuditLog[] @relation("UserAuditLogs")
+  @@map("user")
+}
+
+enum Role {
+  ADMIN
+  BARBER
+  @@map("role")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  @@map("status")
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?  @unique
+  phone     String
+  cpf       String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  appointments Appointment[]
+  @@map("client")
+}
+
+model ServiceType {
+  id              String   @id @default(uuid())
+  name            String
+  durationMinutes Int @map("duration_minutes")
+  priceCents      Int @map("price_cents")
+  paymentAllowed  PaymentAllowed[] @map("payment_allowed")
+  countsAsHaircut Boolean  @default(false) @map("counts_as_haircut")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  appointmentItems AppointmentItem[]
+  @@map("service_type")
+}
+
+enum PaymentAllowed {
+  CASH
+  PIX
+  CREDIT
+  DEBIT
+  @@map("payment_allowed")
+}
+
+model Appointment {
+  id         String   @id @default(uuid())
+  barber     User     @relation("BarberAppointments", fields: [barberId], references: [id])
+  barberId   String @map("barber_id")
+  client     Client   @relation(fields: [clientId], references: [id])
+  clientId   String @map("client_id")
+  items      AppointmentItem[]
+  startAt    DateTime @map("start_at")
+  endAt      DateTime @map("end_at")
+  status     AppointmentStatus @default(SCHEDULED)
+  payment    Payment?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  @@map("appointment")
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CANCELED
+  COMPLETED
+  @@map("appointment_status")
+}
+
+model AppointmentItem {
+  id                   String   @id @default(uuid())
+  appointment          Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId        String @map("appointment_id")
+  serviceType          ServiceType @relation(fields: [serviceTypeId], references: [id])
+  serviceTypeId        String @map("service_type_id")
+  priceCentsSnapshot   Int @map("price_cents_snapshot")
+  durationMinutesSnapshot Int @map("duration_minutes_snapshot")
+  @@map("appointment_item")
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String   @unique @map("appointment_id")
+  method        PaymentAllowed @map("method")
+  amountCents   Int @map("amount_cents")
+  paidAt        DateTime? @map("paid_at")
+  @@map("payment")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUser   User?    @relation("UserAuditLogs", fields: [actorUserId], references: [id])
+  actorUserId String? @map("actor_user_id")
+  action      String
+  entity      String
+  entityId    String @map("entity_id")
+  payload     Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  @@map("audit_log")
+}
