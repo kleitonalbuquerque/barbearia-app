@@ -1,0 +1,57 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Barbearia API - Payments",
+  "dateExported": "2025-09-07T00:00:00.000Z",
+  "requests": [
+    {
+      "_id": "1",
+      "name": "Criar Pagamento",
+      "method": "POST",
+      "url": "http://localhost:3000/api/payments",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"appointmentId\": \"<appointment_id>\",\n  \"method\": \"PIX\",\n  \"amountCents\": 4000,\n  \"paidAt\": \"2025-09-07T12:00:00.000Z\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "2",
+      "name": "Listar Pagamentos",
+      "method": "GET",
+      "url": "http://localhost:3000/api/payments"
+    },
+    {
+      "_id": "3",
+      "name": "Buscar Pagamento por ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/payments/{id}"
+    },
+    {
+      "_id": "4",
+      "name": "Atualizar Pagamento",
+      "method": "PUT",
+      "url": "http://localhost:3000/api/payments/{id}",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"method\": \"CREDIT\",\n  \"amountCents\": 4500\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "5",
+      "name": "Deletar Pagamento",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/payments/{id}"
+    }
+  ]
+}

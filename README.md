@@ -193,6 +193,8 @@ curl -X POST http://localhost:3000/api/appointments \
 ## TODOs (Melhorias Futuras)
 
 - [ ] Adicionar paginação e filtros na listagem de agendamentos
+- [ ] Adicionar filtros e paginação nos clientes
+- [ ] Adicionar filtros e paginação nos barbeiros
 - [ ] Retornar horários disponíveis para agendamento
 - [ ] Adicionar notificações (e-mail/push)
 - [ ] Implementar logs de auditoria detalhados
@@ -222,3 +224,49 @@ curl -X PUT http://localhost:3000/api/appointments/{id} \
 curl -X DELETE http://localhost:3000/api/appointments/{id} \
   -H "Authorization: Bearer novo_admin@email.com"
 ```
+
+---
+
+## API - CRUD Pagamento (Payment)
+
+### Criar pagamento
+```bash
+curl -X POST http://localhost:3000/api/payments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "appointmentId": "<appointment_id>",
+    "method": "PIX",
+    "amountCents": 4000,
+    "paidAt": "2025-09-07T12:00:00.000Z"
+  }'
+```
+
+### Listar pagamentos
+```bash
+curl http://localhost:3000/api/payments
+```
+
+### Buscar pagamento por ID
+```bash
+curl http://localhost:3000/api/payments/{id}
+```
+
+### Atualizar pagamento
+```bash
+curl -X PUT http://localhost:3000/api/payments/{id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "method": "CREDIT",
+    "amountCents": 4500
+  }'
+```
+
+### Deletar pagamento
+```bash
+curl -X DELETE http://localhost:3000/api/payments/{id}
+```
+
+---
+
+## TODOs (Pagamentos)
+- [ ] Adicionar filtros e paginação nos pagamentos
