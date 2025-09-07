@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { sendMail } from '../../../lib/mailer';
 
 const prisma = new PrismaClient();
 
@@ -57,6 +58,49 @@ export async function POST(request: NextRequest) {
       },
       include: { items: true }
     });
+
+    // Busca dados do barbeiro, cliente e serviço para o e-mail
+    const [barberFull, clientFull, serviceType] = await Promise.all([
+      prisma.barber.findUnique({ where: { id: data.barberId } }),
+      prisma.client.findUnique({ where: { id: data.clientId } }),
+      prisma.serviceType.findUnique({ where: { id: data.items[0].serviceTypeId } })
+    ]);
+    // Ajuste de fuso horário para America/Sao_Paulo
+    const dateBr = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(data.startAt));
+    const valor = (serviceType?.priceCents || 0) / 100;
+    const nomeBarbeiro = barberFull?.name || 'Barbeiro';
+  // Separar data e hora para formatar "às"
+  const [dataStr, horaStrRaw] = dateBr.split(', ');
+  // Adiciona 'h' ao final do horário (ex: 13:00h)
+  const horaStr = horaStrRaw ? `${horaStrRaw}h` : '';
+  const dataHoraBr = `${dataStr} às ${horaStr}`;
+  const msg = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço ${serviceType?.name || ''} (R$ ${valor.toFixed(2)}) com o barbeiro ${nomeBarbeiro} em nossa barbearia. Obrigado pela confiança! 😊`;
+  const msgHtml = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço <strong>${serviceType?.name || ''}</strong> (R$ ${valor.toFixed(2)}) com o barbeiro ${nomeBarbeiro} em nossa barbearia. Obrigado pela confiança! 😊`;
+    // Envia e-mail para cliente
+    if (clientFull?.email) {
+      await sendMail({
+        to: clientFull.email,
+        subject: 'Confirmação de Agendamento - Barbearia',
+        text: msg,
+        html: msgHtml
+      });
+    }
+    // Envia e-mail para barbeiro
+    if (barberFull?.email) {
+      await sendMail({
+        to: barberFull.email,
+        subject: 'Novo Agendamento - Barbearia',
+        text: msg,
+        html: msgHtml
+      });
+    }
     return NextResponse.json({ success: true, message: 'Agendamento criado com sucesso!', appointment });
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 400 });
