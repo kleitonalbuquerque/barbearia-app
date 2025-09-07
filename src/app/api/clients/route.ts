@@ -33,10 +33,23 @@ export async function POST(request: Request) {
   }
 }
 
-// Listar clientes
-export async function GET() {
+// Listar clientes com busca dinâmica
+export async function GET(request: Request) {
   try {
-    const clients = await prisma.client.findMany();
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get('q')?.trim();
+    let where = {};
+    if (q) {
+      where = {
+        OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          { email: { contains: q, mode: 'insensitive' } },
+          { phone: { contains: q, mode: 'insensitive' } },
+          { cpf: { contains: q, mode: 'insensitive' } },
+        ],
+      };
+    }
+    const clients = await prisma.client.findMany({ where });
     return NextResponse.json({ success: true, clients });
   } catch (error) {
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });
