@@ -111,25 +111,60 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const where: {
-      barberId?: string;
-      clientId?: string;
-      status?: string;
-      startAt?: { gte: string };
-      endAt?: { lte: string };
-    } = {};
+
     // Filtros
+    const statusParam = searchParams.get('status');
+    let status: string | string[] | undefined = undefined;
+    if (statusParam) {
+      if (statusParam.includes(',')) {
+        status = statusParam.split(',').map(s => s.trim());
+      } else {
+        status = statusParam;
+      }
+    }
+
+    const serviceTypeId = searchParams.get('serviceTypeId');
+    const clientName = searchParams.get('clientName');
+    const barberName = searchParams.get('barberName');
+
+    const where: Record<string, unknown> = {};
     where.barberId = searchParams.get('barberId') ?? undefined;
     where.clientId = searchParams.get('clientId') ?? undefined;
-    where.status = searchParams.get('status') ?? undefined;
+    if (status) {
+      if (Array.isArray(status)) {
+        where.status = { in: status };
+      } else {
+        where.status = status;
+      }
+    }
     where.startAt = searchParams.get('startAt') ? { gte: searchParams.get('startAt')! } : undefined;
     where.endAt = searchParams.get('endAt') ? { lte: searchParams.get('endAt')! } : undefined;
+
+    // Filtro por serviceTypeId (precisa filtrar por items)
+    if (serviceTypeId) {
+      where.items = { some: { serviceTypeId } };
+    }
+
+    // Filtro por nome do cliente (busca textual, case-insensitive)
+    if (clientName) {
+      where.client = { name: { contains: clientName, mode: 'insensitive' } };
+    }
+    // Filtro por nome do barbeiro (busca textual, case-insensitive)
+    if (barberName) {
+      where.barber = { name: { contains: barberName, mode: 'insensitive' } };
+    }
 
     // Paginação
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
     const take = pageSize;
+
+    // Ordenação customizável
+    const orderByParam = searchParams.get('orderBy') || 'startAt';
+    const orderParam = searchParams.get('order') || 'desc';
+  const orderBy: Record<string, 'asc' | 'desc'> = {};
+  orderBy[orderByParam] = orderParam === 'asc' ? 'asc' : 'desc';
 
     // Busca total de registros para os filtros
     const total = await prisma.appointment.count({ where });
@@ -139,7 +174,7 @@ export async function GET(request: NextRequest) {
       include: { items: true },
       skip,
       take,
-      orderBy: { startAt: 'desc' }
+      orderBy
     });
     return NextResponse.json({ success: true, appointments, total, page, pageSize });
   } catch (error) {

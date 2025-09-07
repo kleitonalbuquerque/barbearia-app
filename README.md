@@ -270,3 +270,56 @@ curl -X DELETE http://localhost:3000/api/payments/{id}
 
 ## TODOs (Pagamentos)
 - [ ] Adicionar filtros e paginação nos pagamentos
+
+---
+
+### Filtros e Paginação - Listar Agendamentos
+
+O endpoint GET `/api/appointments` suporta os seguintes filtros e parâmetros de paginação/ordenação:
+
+| Parâmetro         | Tipo     | Descrição                                                                                 | Exemplo de uso                                                                 |
+|-------------------|----------|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `barberId`        | string   | Filtra por ID do barbeiro                                                               | `?barberId=13b9bcb6-...`                                                      |
+| `clientId`        | string   | Filtra por ID do cliente                                                                | `?clientId=97c4ed2a-...`                                                      |
+| `status`          | string   | Filtra por status único ou múltiplos separados por vírgula                              | `?status=SCHEDULED` ou `?status=SCHEDULED,COMPLETED`                          |
+| `serviceTypeId`   | string   | Filtra por tipo de serviço (serviceTypeId)                                              | `?serviceTypeId=9b75c49f-...`                                                 |
+| `startAt`         | string   | Filtra agendamentos a partir desta data/hora (UTC, ISO 8601)                            | `?startAt=2025-09-01T00:00:00.000Z`                                           |
+| `endAt`           | string   | Filtra agendamentos até esta data/hora (UTC, ISO 8601)                                  | `?endAt=2025-09-30T23:59:59.999Z`                                             |
+| `page`            | number   | Número da página (padrão: 1)                                                            | `?page=2`                                                                     |
+| `pageSize`        | number   | Quantidade de registros por página (padrão: 10)                                         | `?pageSize=20`                                                                |
+| `orderBy`         | string   | Campo para ordenação (ex: startAt, status, clientId, barberId)                          | `?orderBy=startAt`                                                            |
+| `order`           | string   | Direção da ordenação: `asc` (crescente) ou `desc` (decrescente, padrão)                 | `?order=asc`                                                                  |
+| `clientName`      | string   | Busca textual (contém, sem case sensitive) no nome do cliente                        | `?clientName=joao`                                                             |
+| `barberName`      | string   | Busca textual (contém, sem case sensitive) no nome do barbeiro                       | `?barberName=pedro`                                                            |
+
+#### Exemplos de uso
+
+- Listar agendamentos do barbeiro por múltiplos status, ordenando do mais antigo para o mais recente:
+  ```bash
+  curl "http://localhost:3000/api/appointments?barberId=13b9bcb6-14b0-4e6b-82f2-fd353917781d&status=SCHEDULED,COMPLETED&orderBy=startAt&order=asc&page=1&pageSize=10"
+  ```
+- Listar agendamentos de um cliente em setembro de 2025:
+  ```bash
+  curl "http://localhost:3000/api/appointments?clientId=97c4ed2a-1b25-4f37-bd92-20b6f7e61ccf&startAt=2025-09-01T00:00:00.000Z&endAt=2025-09-30T23:59:59.999Z&page=1&pageSize=10"
+  ```
+- Filtrar por tipo de serviço:
+  ```bash
+  curl "http://localhost:3000/api/appointments?serviceTypeId=9b75c49f-5633-44bf-94b2-7dc369df5d7d&page=1&pageSize=10"
+  ```
+- Ordenar por status:
+  ```bash
+  curl "http://localhost:3000/api/appointments?orderBy=status&order=asc&page=1&pageSize=10"
+  ```
+- Buscar agendamentos de clientes cujo nome contém "Kleiton":
+  ```bash
+  curl "http://localhost:3000/api/appointments?clientName=Kleiton&page=1&pageSize=10"
+  ```
+- Buscar agendamentos de barbeiros cujo nome contém "Lucas":
+  ```bash
+  curl "http://localhost:3000/api/appointments?barberName=Lucas&page=1&pageSize=10"
+  ```
+
+A resposta inclui:
+- `appointments`: lista paginada dos agendamentos
+- `total`: total de registros encontrados
+- `page`, `pageSize`: informações da paginação
