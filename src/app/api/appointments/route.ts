@@ -169,7 +169,10 @@ export async function GET(request: NextRequest) {
     // Busca total de registros para os filtros
     const total = await prisma.appointment.count({ where });
     // Busca paginada
-    const include: any = { items: { include: { serviceType: true } } };
+    const include: {
+      items: { include: { serviceType: boolean } };
+      barber?: boolean;
+    } = { items: { include: { serviceType: true } } };
     // Permitir incluir barbeiro se solicitado (para compatibilidade com frontend)
     if (searchParams.get('includeBarber') === 'true') {
       include.barber = true;
