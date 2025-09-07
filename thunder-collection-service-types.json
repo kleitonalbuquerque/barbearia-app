@@ -1,0 +1,71 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Barbearia API - Tipos de Serviço",
+  "dateExported": "2025-09-06T00:00:00.000Z",
+  "requests": [
+    {
+      "_id": "1",
+      "name": "Criar Tipo de Serviço",
+      "method": "POST",
+      "url": "http://localhost:3000/api/service-types",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Corte Masculino\",\n  \"durationMinutes\": 30,\n  \"price\": 30.00,\n  \"paymentAllowed\": [\"CASH\", \"PIX\", \"CREDIT\", \"DEBIT\"],\n  \"countsAsHaircut\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    },
+    {
+      "_id": "2",
+      "name": "Listar Tipos de Serviço",
+      "method": "GET",
+      "url": "http://localhost:3000/api/service-types"
+    },
+    {
+      "_id": "3",
+      "name": "Buscar Tipo de Serviço por ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/service-types/{id}"
+    },
+    {
+      "_id": "4",
+      "name": "Atualizar Tipo de Serviço",
+      "method": "PUT",
+      "url": "http://localhost:3000/api/service-types/{id}",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Corte Atualizado\",\n  \"durationMinutes\": 40,\n  \"price\": 35.50,\n  \"paymentAllowed\": [\"CASH\", \"PIX\"],\n  \"countsAsHaircut\": false\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    },
+    {
+      "_id": "5",
+      "name": "Deletar Tipo de Serviço",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/service-types/{id}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    }
+  ]
+}

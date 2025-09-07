@@ -66,7 +66,7 @@ model ServiceType {
   id              String   @id @default(uuid())
   name            String
   durationMinutes Int @map("duration_minutes")
-  priceCents      Int @map("price_cents")
+  priceCents      Float @map("price_cents")
   paymentAllowed  PaymentAllowed[] @map("payment_allowed")
   countsAsHaircut Boolean  @default(false) @map("counts_as_haircut")
   createdAt       DateTime @default(now()) @map("created_at")

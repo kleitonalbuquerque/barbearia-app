@@ -106,7 +106,63 @@ curl -X PUT http://localhost:3000/api/clients/{id} \
   -d '{"name":"Maria Atualizada"}'
 ```
 
+
 ### Deletar cliente
 ```bash
 curl -X DELETE http://localhost:3000/api/clients/{id}
+```
+
+---
+
+## API - CRUD Tipo de Serviço (Acesso restrito ao superadmin)
+
+### Criar tipo de serviço
+```bash
+curl -X POST http://localhost:3000/api/service-types \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer novo_admin@email.com" \
+  -d '{
+    "name": "Corte Masculino",
+    "durationMinutes": 30,
+    "priceCents": 4000,
+    "paymentAllowed": ["CASH", "PIX", "CREDIT", "DEBIT"],
+    "countsAsHaircut": true
+  }'
+```
+
+Campos:
+- `name`: Nome do serviço (ex: Corte Masculino)
+- `durationMinutes`: Duração em minutos (ex: 30)
+- `priceCents`: Preço em centavos (ex: 4000 para R$ 40,00)
+- `paymentAllowed`: Array de métodos permitidos (`CASH`, `PIX`, `CREDIT`, `DEBIT`)
+- `countsAsHaircut`: (opcional) Se conta como corte de cabelo (boolean)
+
+### Listar tipos de serviço
+```bash
+curl http://localhost:3000/api/service-types
+```
+
+### Buscar tipo de serviço por ID
+```bash
+curl http://localhost:3000/api/service-types/{id}
+```
+
+### Atualizar tipo de serviço
+```bash
+curl -X PUT http://localhost:3000/api/service-types/{id} \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer novo_admin@email.com" \
+  -d '{
+    "name": "Corte Atualizado",
+    "durationMinutes": 40,
+    "priceCents": 5000,
+    "paymentAllowed": ["CASH", "PIX"],
+    "countsAsHaircut": false
+  }'
+```
+
+### Deletar tipo de serviço
+```bash
+curl -X DELETE http://localhost:3000/api/service-types/{id} \
+  -H "Authorization: Bearer novo_admin@email.com"
 ```
