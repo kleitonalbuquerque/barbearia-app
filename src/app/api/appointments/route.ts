@@ -118,13 +118,30 @@ export async function GET(request: NextRequest) {
       startAt?: { gte: string };
       endAt?: { lte: string };
     } = {};
-  where.barberId = searchParams.get('barberId') ?? undefined;
-  where.clientId = searchParams.get('clientId') ?? undefined;
-  where.status = searchParams.get('status') ?? undefined;
-  where.startAt = searchParams.get('startAt') ? { gte: searchParams.get('startAt')! } : undefined;
-  where.endAt = searchParams.get('endAt') ? { lte: searchParams.get('endAt')! } : undefined;
-    const appointments = await prisma.appointment.findMany({ where, include: { items: true } });
-    return NextResponse.json({ success: true, appointments });
+    // Filtros
+    where.barberId = searchParams.get('barberId') ?? undefined;
+    where.clientId = searchParams.get('clientId') ?? undefined;
+    where.status = searchParams.get('status') ?? undefined;
+    where.startAt = searchParams.get('startAt') ? { gte: searchParams.get('startAt')! } : undefined;
+    where.endAt = searchParams.get('endAt') ? { lte: searchParams.get('endAt')! } : undefined;
+
+    // Paginação
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    // Busca total de registros para os filtros
+    const total = await prisma.appointment.count({ where });
+    // Busca paginada
+    const appointments = await prisma.appointment.findMany({
+      where,
+      include: { items: true },
+      skip,
+      take,
+      orderBy: { startAt: 'desc' }
+    });
+    return NextResponse.json({ success: true, appointments, total, page, pageSize });
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }
