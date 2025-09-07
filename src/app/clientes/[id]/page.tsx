@@ -1,25 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-function getStatusColor(status: string) {
-  if (status === "CANCELADO") return "text-red-700";
-  if (status === "CONCLUÍDO") return "text-green-700";
-  if (status === "AGENDADO") return "text-blue-700";
-  return "text-gray-700";
-}
-// Função para traduzir status para português
-function traduzirStatus(status: string) {
-  switch (status) {
-    case "SCHEDULED":
-      return "AGENDADO";
-    case "COMPLETED":
-      return "CONCLUÍDO";
-    case "CANCELED":
-      return "CANCELADO";
-    default:
-      return status;
-  }
-}
+import { useParams, useRouter } from "next/navigation";
+import AgendamentosTable from "@/components/AgendamentosTable";
 
 interface Client {
   id: string;
@@ -56,6 +38,7 @@ interface Payment {
 
 export default function ClienteDetalhePage() {
   const params = useParams();
+  const router = useRouter();
   const clientId = params?.id as string;
   const [client, setClient] = useState<Client | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -81,7 +64,15 @@ export default function ClienteDetalhePage() {
   } else if (client) {
     conteudo = (
       <>
-        <h1 className="text-2xl font-bold mb-6 text-white">Cliente: {client.name}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-white">Cliente: {client.name}</h1>
+          <button
+            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-semibold px-4 py-2 rounded shadow transition"
+            onClick={() => router.back()}
+          >
+            Voltar
+          </button>
+        </div>
         <section className="mb-8">
           <strong>Email:</strong> {client.email} <br />
           <strong>Telefone:</strong> {client.phone} <br />
@@ -89,66 +80,7 @@ export default function ClienteDetalhePage() {
         </section>
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-4 text-white">Serviços realizados/cancelados</h2>
-          {appointments.length === 0 ? (
-            <div className="bg-white dark:bg-gray-900 rounded shadow p-6 text-center text-gray-700 dark:text-gray-300">
-              Nenhum serviço agendado para este cliente.
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded shadow">
-              <table className="min-w-full bg-white dark:bg-gray-900">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Data de Agendamento</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Hora</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Serviço(s)</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Barbeiro</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Status</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Valor</th>
-                    <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap">Forma de Pagamento</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.map((appt) => {
-                    const data = new Date(appt.startAt);
-                    const dataStr = data.toLocaleDateString("pt-BR");
-                    const horaStr = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-                    return (
-                      <tr key={appt.id} className="hover:bg-blue-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800">
-                        <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{dataStr}</td>
-                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{horaStr}</td>
-                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                          {appt.items && appt.items.length > 0
-                            ? appt.items.map((item) => item.serviceType?.name || "-").join(", ")
-                            : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{appt.barber?.name || "-"}</td>
-                        <td className={`px-4 py-3 font-bold ${getStatusColor(traduzirStatus(appt.status))}`}>
-                          {traduzirStatus(appt.status)}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                          {appt.items && appt.items.length > 0
-                            ? appt.items
-                                .map((item) =>
-                                  (item.priceCentsSnapshot / 100).toLocaleString("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL",
-                                  })
-                                )
-                                .join(", ")
-                            : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                          {appt.payment
-                            ? `${appt.payment.method} (${(appt.payment.amountCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })})`
-                            : "-"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <AgendamentosTable appointments={appointments} />
         </section>
       </>
     );

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import DataTable, { DataTableColumn } from "@/components/DataTable";
 
 interface Client {
   id: string;
@@ -24,8 +25,35 @@ export default function ClientesPage() {
       .finally(() => setLoading(false));
   }, [search]);
 
+  const columns: DataTableColumn<Client>[] = [
+    {
+      key: "name",
+      header: "Nome",
+      render: (client) => client.name,
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+    },
+    {
+      key: "email",
+      header: "Email",
+      render: (client) => client.email,
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+    },
+    {
+      key: "phone",
+      header: "Telefone",
+      render: (client) => client.phone,
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+    },
+    {
+      key: "cpf",
+      header: "CPF",
+      render: (client) => client.cpf,
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+    },
+  ];
+
   return (
-  <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
+    <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-white">Clientes</h1>
         <button
@@ -44,48 +72,14 @@ export default function ClientesPage() {
       {loading ? (
         <p className="text-gray-700">Carregando...</p>
       ) : (
-        <div className="overflow-x-auto rounded shadow">
-          <table className="min-w-full bg-white dark:bg-gray-900">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">
-                  Nome
-                </th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">
-                  Email
-                </th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">
-                  Telefone
-                </th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">
-                  CPF
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((client) => (
-                <tr
-                  key={client.id}
-                  className="hover:bg-blue-50 dark:hover:bg-gray-800 cursor-pointer border-b border-gray-100 dark:border-gray-800"
-                  onClick={() => router.push(`/clientes/${client.id}`)}
-                >
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
-                    {client.name}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                    {client.email}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                    {client.phone}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                    {client.cpf}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={clients}
+          emptyMessage="Nenhum cliente encontrado."
+          rowKey={(row) => row.id}
+          tableClassName="min-w-full bg-white dark:bg-gray-900"
+          onRowClick={(client) => router.push(`/clientes/${client.id}`)}
+        />
       )}
     </div>
   );
