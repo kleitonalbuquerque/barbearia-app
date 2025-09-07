@@ -1,5 +1,24 @@
 // Prisma schema for barbearia-app
-// Models: User, Client, ServiceType, Appointment, AppointmentItem, Payment, AuditLog
+// Models: User, Barber, Client, ServiceType, Appointment, AppointmentItem, Payment, AuditLog
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(ADMIN)
+  phone     String
+  cpf       String?  @unique
+  cnpj      String?  @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("user")
+}
+
+enum UserRole {
+  ADMIN
+  @@map("user_role")
+}
 
 generator client {
   provider = "prisma-client-js"
@@ -10,26 +29,19 @@ datasource db {
   url       = env("DATABASE_URL")
 }
 
-model User {
+model Barber {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
   phone     String
   cpf       String?  @unique
   cnpj      String?  @unique
-  role      Role
   status    Status   @default(ACTIVE)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   appointments Appointment[] @relation("BarberAppointments")
-  auditLogs  AuditLog[] @relation("UserAuditLogs")
-  @@map("user")
-}
-
-enum Role {
-  ADMIN
-  BARBER
-  @@map("role")
+  auditLogs  AuditLog[] @relation("BarberAuditLogs")
+  @@map("barber")
 }
 
 enum Status {
@@ -73,7 +85,7 @@ enum PaymentAllowed {
 
 model Appointment {
   id         String   @id @default(uuid())
-  barber     User     @relation("BarberAppointments", fields: [barberId], references: [id])
+  barber     Barber     @relation("BarberAppointments", fields: [barberId], references: [id])
   barberId   String @map("barber_id")
   client     Client   @relation(fields: [clientId], references: [id])
   clientId   String @map("client_id")
@@ -117,8 +129,8 @@ model Payment {
 
 model AuditLog {
   id          String   @id @default(uuid())
-  actorUser   User?    @relation("UserAuditLogs", fields: [actorUserId], references: [id])
-  actorUserId String? @map("actor_user_id")
+  actorBarber   Barber?    @relation("BarberAuditLogs", fields: [actorBarberId], references: [id])
+  actorBarberId String? @map("actor_barber_id")
   action      String
   entity      String
   entityId    String @map("entity_id")

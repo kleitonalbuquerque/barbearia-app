@@ -1,0 +1,57 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Barbearia API - Clientes",
+  "dateExported": "2025-09-05T00:00:00.000Z",
+  "requests": [
+    {
+      "_id": "1",
+      "name": "Criar Cliente",
+      "method": "POST",
+      "url": "http://localhost:3000/api/clients",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Maria Cliente\",\n  \"email\": \"maria@cliente.com\",\n  \"phone\": \"11988887777\",\n  \"cpf\": \"98765432100\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "2",
+      "name": "Listar Clientes",
+      "method": "GET",
+      "url": "http://localhost:3000/api/clients"
+    },
+    {
+      "_id": "3",
+      "name": "Buscar Cliente por ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/clients/{id}"
+    },
+    {
+      "_id": "4",
+      "name": "Atualizar Cliente",
+      "method": "PUT",
+      "url": "http://localhost:3000/api/clients/{id}",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Maria Atualizada\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "5",
+      "name": "Deletar Cliente",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/clients/{id}"
+    }
+  ]
+}
