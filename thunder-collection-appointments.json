@@ -1,0 +1,71 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Barbearia API - Appointments",
+  "dateExported": "2025-09-07T00:00:00.000Z",
+  "requests": [
+    {
+      "_id": "1",
+      "name": "Criar Agendamento",
+      "method": "POST",
+      "url": "http://localhost:3000/api/appointments",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"barberId\": \"<barber_id>\",\n  \"clientId\": \"<client_id>\",\n  \"startAt\": \"2025-09-07T10:00:00.000Z\",\n  \"endAt\": \"2025-09-07T10:30:00.000Z\",\n  \"items\": [{\n    \"serviceTypeId\": \"<service_type_id>\",\n    \"priceCentsSnapshot\": 40.00,\n    \"durationMinutesSnapshot\": 30\n  }]\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    },
+    {
+      "_id": "2",
+      "name": "Listar Agendamentos",
+      "method": "GET",
+      "url": "http://localhost:3000/api/appointments"
+    },
+    {
+      "_id": "3",
+      "name": "Buscar Agendamento por ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/appointments/{id}"
+    },
+    {
+      "_id": "4",
+      "name": "Atualizar Agendamento",
+      "method": "PUT",
+      "url": "http://localhost:3000/api/appointments/{id}",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"CANCELED\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    },
+    {
+      "_id": "5",
+      "name": "Deletar Agendamento",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/appointments/{id}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer novo_admin@email.com"
+        }
+      ]
+    }
+  ]
+}

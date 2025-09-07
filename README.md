@@ -166,3 +166,59 @@ curl -X PUT http://localhost:3000/api/service-types/{id} \
 curl -X DELETE http://localhost:3000/api/service-types/{id} \
   -H "Authorization: Bearer novo_admin@email.com"
 ```
+
+---
+
+## API - CRUD Agendamento (Appointment)
+
+### Criar agendamento
+```bash
+curl -X POST http://localhost:3000/api/appointments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer novo_admin@email.com" \
+  -d '{
+    "barberId": "<barber_id>",
+    "clientId": "<client_id>",
+    "startAt": "2025-09-07T10:00:00.000Z",
+    "endAt": "2025-09-07T10:30:00.000Z",
+    "items": [
+      {
+        "serviceTypeId": "<service_type_id>",
+        "priceCentsSnapshot": 40.00,
+        "durationMinutesSnapshot": 30
+      }
+    ]
+  }'
+```
+## TODOs (Melhorias Futuras)
+
+- [ ] Adicionar paginação e filtros na listagem de agendamentos
+- [ ] Retornar horários disponíveis para agendamento
+- [ ] Adicionar notificações (e-mail/push)
+- [ ] Implementar logs de auditoria detalhados
+- [ ] Criar testes automatizados para endpoints de agendamento
+### Listar agendamentos
+```bash
+curl http://localhost:3000/api/appointments
+```
+
+### Buscar agendamento por ID
+```bash
+curl http://localhost:3000/api/appointments/{id}
+```
+
+### Atualizar agendamento
+```bash
+curl -X PUT http://localhost:3000/api/appointments/{id} \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer novo_admin@email.com" \
+  -d '{
+    "status": "CANCELED"
+  }'
+```
+
+### Deletar agendamento
+```bash
+curl -X DELETE http://localhost:3000/api/appointments/{id} \
+  -H "Authorization: Bearer novo_admin@email.com"
+```
