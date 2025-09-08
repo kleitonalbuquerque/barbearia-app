@@ -3,8 +3,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Buscar agendamento por ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+// Handler compatível com Next.js 14+/Netlify/Vercel
+export async function GET(request: NextRequest, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {
+  let params: { id: string };
+  if ('then' in context.params) {
+    params = await context.params;
+  } else {
+    params = context.params;
+  }
   try {
     const appointment = await prisma.appointment.findUnique({
       where: { id: params.id },
