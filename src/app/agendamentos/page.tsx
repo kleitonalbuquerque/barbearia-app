@@ -2,9 +2,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-
-
-import AgendamentoFilters from "@/components/agendamentos/AgendamentoFilters";
 import AgendamentoModal from "@/components/agendamentos/AgendamentoModal";
 
 interface Appointment {
@@ -18,7 +15,7 @@ interface Appointment {
 }
 interface Barber { id: string; name: string; }
 interface Client { id: string; name: string; }
-interface ServiceType { id: string; name: string; }
+interface ServiceType { id: string; name: string; priceCents: number; }
 export default function AgendamentosPage() {
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -100,8 +97,8 @@ export default function AgendamentosPage() {
               const data = new Date(a.startAt);
               const dataStr = data.toLocaleDateString("pt-BR");
               const horaStr = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-              const servico = a.items.map(i => i.serviceType.name).join(", ");
-              const preco = a.items.reduce((acc, i) => acc + (i.serviceType.priceCents || 0), 0) / 100;
+              const servico = a.items.map(i => i.serviceType?.name || "-").join(", ");
+              const preco = a.items.reduce((acc, i) => acc + (i.serviceType?.priceCents || 0), 0) / 100;
               let statusLabel = a.status;
               if (a.status === "SCHEDULED") statusLabel = "Agendado";
               else if (a.status === "COMPLETED") statusLabel = "Concluído";

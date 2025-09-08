@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useServiceTypes, ServiceType } from "@/hooks/useServiceTypes";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from "@headlessui/react";
 import type { Appointment } from "./AgendamentosTable";
@@ -8,8 +9,8 @@ interface AppointmentSaveData {
   date: Date | null;
   status: string;
   paymentMethod: string;
+  serviceTypeId: string;
 }
-
 interface AppointmentEditModalProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
@@ -19,30 +20,33 @@ interface AppointmentEditModalProps {
   readonly paymentMethods: readonly string[];
 }
 
-
 export default function AppointmentEditModal({ isOpen, onClose, appointment, onSave, canEditStatus, paymentMethods }: AppointmentEditModalProps) {
   const [date, setDate] = useState<Date | null>(null);
   const [status, setStatus] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [serviceTypeName, setServiceTypeName] = useState("");
+  const [serviceTypeId, setServiceTypeId] = useState("");
   const [servicePrice, setServicePrice] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { serviceTypes } = useServiceTypes();
 
-  // Sempre sincronizar os states com o appointment ao abrir o modal ou mudar o appointment
-  React.useEffect(() => {
+  useEffect(() => {
     if (appointment) {
       setDate(appointment.startAt ? new Date(appointment.startAt) : null);
       setStatus(appointment.status || "");
       setPaymentMethod(appointment.payment?.method || "");
-      setServiceTypeName(appointment.items?.[0]?.serviceType?.name || "");
-      setServicePrice(appointment.items?.[0]?.priceCentsSnapshot ? appointment.items[0].priceCentsSnapshot / 100 : 0);
+      setServiceTypeId(appointment.items?.[0]?.serviceTypeId || "");
+      if (appointment.items?.[0]?.priceCentsSnapshot) {
+        setServicePrice(appointment.items[0].priceCentsSnapshot / 100);
+      } else if (appointment.items?.[0]?.serviceTypeId && serviceTypes.length) {
+        const st = serviceTypes.find(s => s.id === appointment.items[0].serviceTypeId);
+        setServicePrice(st ? st.priceCents / 100 : 0);
+      }
     }
-  }, [appointment, isOpen]);
+  }, [appointment, isOpen, serviceTypes]);
 
-  // Limpa método de pagamento se status for CANCELLED
-  React.useEffect(() => {
+  useEffect(() => {
     if (status === "CANCELLED" && paymentMethod) {
       setPaymentMethod("");
     }
@@ -58,6 +62,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
         date,
         status,
         paymentMethod,
+        serviceTypeId,
       });
       setSuccess("Agendamento atualizado com sucesso!");
       setTimeout(() => {
@@ -101,17 +106,26 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
               <label htmlFor="edit-date" className="block text-sm font-semibold mb-1">Data e hora</label>
               <TailwindDatePicker id="edit-date" value={date} onChange={setDate} placeholder="dd/mm/yyyy" />
             </div>
-            {/* Serviço e preço (estrutura inicial, select será implementado em seguida) */}
+            {/* Serviço e preço editáveis */}
             <div>
               <label htmlFor="edit-service" className="block text-sm font-semibold mb-1">Serviço</label>
-              <input
+              <select
                 id="edit-service"
-                type="text"
-                value={serviceTypeName}
-                readOnly
-                disabled
-                className="p-2 border rounded w-full bg-gray-100 text-gray-900 dark:text-gray-100 dark:bg-gray-800 cursor-not-allowed"
-              />
+                className="p-2 border rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                value={serviceTypeId}
+                onChange={e => {
+                  setServiceTypeId(e.target.value);
+                  const st = serviceTypes.find(s => s.id === e.target.value);
+                  setServicePrice(st ? st.priceCents / 100 : 0);
+                }}
+                required
+                disabled={status === "CANCELED"}
+              >
+                <option value="">Selecione</option>
+                {serviceTypes.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="edit-price" className="block text-sm font-semibold mb-1">Preço</label>

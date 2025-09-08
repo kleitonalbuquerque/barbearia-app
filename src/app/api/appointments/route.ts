@@ -56,7 +56,11 @@ export async function POST(request: NextRequest) {
           }))
         }
       },
-      include: { items: true }
+      include: {
+        items: { include: { serviceType: true } },
+        barber: true,
+        client: { select: { id: true, name: true } }
+      }
     });
 
     // Busca dados do barbeiro, cliente e serviço para o e-mail
@@ -102,6 +106,7 @@ export async function POST(request: NextRequest) {
       });
     }
     return NextResponse.json({ success: true, message: 'Agendamento criado com sucesso!', appointment });
+  // Agora appointment já vem com barber, client e items.serviceType populados
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useAuth } from "@/contexts/AuthContext";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 
@@ -48,6 +49,7 @@ export default function BarbeiroDetalhePage() {
   const router = useRouter();
   const barberId = params?.id as string;
   const [barber, setBarber] = useState<Barber | null>(null);
+  const { serviceTypes } = useServiceTypes();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editAppointment, setEditAppointment] = useState<Appointment | null>(null);
@@ -361,9 +363,11 @@ export default function BarbeiroDetalhePage() {
                     update?: { method: string };
                     create?: { method: string; amountCents: number };
                   };
+                  serviceTypeId?: string;
                 } = {
                   startAt: data.date ? data.date.toISOString() : editAppointment.startAt,
                   status: data.status,
+                  serviceTypeId: data.serviceTypeId,
                 };
                 // Só envie payment se realmente for criar/alterar
                 if (
@@ -388,11 +392,23 @@ export default function BarbeiroDetalhePage() {
                   if (a.payment && data.paymentMethod) {
                     updatedPayment = { ...a.payment, method: data.paymentMethod, id: a.payment.id };
                   }
+                  // Atualiza também o serviço e preço localmente
+                  let updatedItems = a.items;
+                  if (data.serviceTypeId) {
+                    const st = serviceTypes.find(s => s.id === data.serviceTypeId);
+                    updatedItems = [{
+                      ...a.items[0],
+                      serviceTypeId: data.serviceTypeId,
+                      priceCentsSnapshot: st ? st.priceCents : a.items[0].priceCentsSnapshot,
+                      serviceType: st ? { name: st.name } : a.items[0].serviceType,
+                    }];
+                  }
                   return {
                     ...a,
                     startAt: data.date ? data.date.toISOString() : a.startAt,
                     payment: updatedPayment,
                     status: data.status || a.status,
+                    items: updatedItems,
                   };
                 }));
                 setEditAppointment(null);

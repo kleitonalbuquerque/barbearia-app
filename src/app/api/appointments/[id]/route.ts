@@ -23,17 +23,37 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const data = await request.json();
-    const { payment, ...rest } = data;
+    const { payment, serviceTypeId, ...rest } = data;
     // Se o status for CANCELED, remove o payment associado (se existir)
     if (rest.status === 'CANCELED') {
       await prisma.payment.deleteMany({ where: { appointmentId: params.id } });
     }
+
     // Atualiza dados do agendamento
     const updated = await prisma.appointment.update({
       where: { id: params.id },
       data: rest,
       include: { items: true, payment: true }
     });
+
+    // Atualiza o serviço do item (assume 1 item por agendamento)
+    if (serviceTypeId) {
+      // Busca preço e duração do novo serviço
+      const serviceType = await prisma.serviceType.findUnique({ where: { id: serviceTypeId } });
+      if (!serviceType) {
+        return NextResponse.json({ success: false, message: 'Tipo de serviço não encontrado.' }, { status: 400 });
+      }
+      // Atualiza o item do agendamento
+      await prisma.appointmentItem.updateMany({
+        where: { appointmentId: params.id },
+        data: {
+          serviceTypeId: serviceType.id,
+          priceCentsSnapshot: serviceType.priceCents,
+          durationMinutesSnapshot: serviceType.durationMinutes,
+        },
+      });
+    }
+
     // Se houver alteração/criação de payment e não for cancelado
     if (payment && rest.status !== 'CANCELED') {
       if (payment.update) {
@@ -52,7 +72,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         });
       }
     }
-    // Retorna agendamento atualizado com payment
+    // Retorna agendamento atualizado com payment e items
     const result = await prisma.appointment.findUnique({
       where: { id: params.id },
       include: { items: true, payment: true }

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 interface ServiceType {
   id: string;
   name: string;
+  priceCents: number;
 }
 interface Barber {
   id: string;
@@ -33,7 +34,7 @@ interface AgendamentoModalProps {
   clients: Client[];
 }
 
-export default function AgendamentoModal({ open, onClose, onCreated, serviceTypes, barbers, clients }: AgendamentoModalProps) {
+export default function AgendamentoModal({ open, onClose, onCreated, serviceTypes, barbers, clients }: Readonly<AgendamentoModalProps>) {
   const [form, setForm] = useState({
     date: "",
     time: "",
@@ -84,30 +85,62 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white dark:bg-gray-900 rounded shadow-lg p-6 w-full max-w-md relative">
-        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={onClose}>&times;</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay escuro com opacidade */}
+      <div className="absolute inset-0 bg-black" style={{ opacity: 0.80 }} />
+      <div className="relative z-10 bg-white dark:bg-gray-900 rounded shadow-lg p-6 w-full max-w-md">
+        <button
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl font-bold w-10 h-10 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onClick={onClose}
+          aria-label="Fechar modal"
+        >
+          &times;
+        </button>
         <h2 className="text-xl font-bold mb-4">Novo Agendamento</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label>Data</label>
-          <input type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded" />
-          <label>Horário</label>
-          <input type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded" />
-          <label>Barbeiro</label>
-          <select name="barberId" value={form.barberId} onChange={handleChange} required className="p-2 border rounded">
+          <label htmlFor="agendamento-date">Data</label>
+          <input id="agendamento-date" type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded" />
+          <label htmlFor="agendamento-time">Horário</label>
+          <input id="agendamento-time" type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded" />
+          <label htmlFor="agendamento-barber">Barbeiro</label>
+          <select id="agendamento-barber" name="barberId" value={form.barberId} onChange={handleChange} required className="p-2 border rounded">
             <option value="">Selecione</option>
             {barbers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
-          <label>Cliente</label>
-          <select name="clientId" value={form.clientId} onChange={handleChange} required className="p-2 border rounded">
+          <label htmlFor="agendamento-client">Cliente</label>
+          <select id="agendamento-client" name="clientId" value={form.clientId} onChange={handleChange} required className="p-2 border rounded">
             <option value="">Selecione</option>
             {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <label>Tipo de Serviço</label>
-          <select name="serviceTypeId" value={form.serviceTypeId} onChange={handleChange} required className="p-2 border rounded">
-            <option value="">Selecione</option>
-            {serviceTypes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          <label htmlFor="serviceTypeId">Tipo de Serviço</label>
+          <div className="flex items-center gap-2">
+            <select
+              id="serviceTypeId"
+              name="serviceTypeId"
+              value={form.serviceTypeId}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded flex-1"
+            >
+              <option value="">Selecione</option>
+              {serviceTypes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            {/* Exibe valor do serviço selecionado */}
+            {form.serviceTypeId && (
+              <span className="text-gray-700 text-sm bg-gray-100 rounded px-2 py-1">
+                {(() => {
+                  const servico = serviceTypes.find(s => s.id === form.serviceTypeId);
+                  // Se tiver priceCents, mostra, senão só nome
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore: pode não ter priceCents no tipo, mas backend retorna
+                  const preco = servico && typeof servico.priceCents === 'number' ? servico.priceCents : undefined;
+                  return servico && preco !== undefined
+                    ? `R$ ${(preco / 100).toFixed(2)}`
+                    : null;
+                })()}
+              </span>
+            )}
+          </div>
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded" disabled={saving}>
             {saving ? "Agendando..." : "Agendar"}
