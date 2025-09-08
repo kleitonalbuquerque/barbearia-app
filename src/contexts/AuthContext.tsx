@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useMemo, useEffe
 interface AuthContextType {
   isAuthenticated: boolean;
   user: { id: string; email: string; role: string } | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   fetchAuthed: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
@@ -13,13 +14,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<{ id: string; email: string; role: string } | null>(null);
+  const [loading, setLoading] = useState(true);
   // Restaurar sessão do cookie ao carregar
   useEffect(() => {
-    fetch("/api/auth/me")
+    setLoading(true);
+    fetch("/api/auth/me", { credentials: "include" })
       .then(res => res.json())
       .then(data => {
         if (data.success && data.user) setUser(data.user);
-      });
+        else setUser(null);
+      })
+      .finally(() => setLoading(false));
   }, []);
   const isAuthenticated = !!user;
 
@@ -56,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user]
   );
 
-  const value = useMemo(() => ({ isAuthenticated, user, login, logout, fetchAuthed }), [isAuthenticated, user, fetchAuthed]);
+  const value = useMemo(() => ({ isAuthenticated, user, loading, login, logout, fetchAuthed }), [isAuthenticated, user, loading, fetchAuthed]);
   return (
     <AuthContext.Provider value={value}>
       {children}

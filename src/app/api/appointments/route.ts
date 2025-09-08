@@ -126,6 +126,7 @@ export async function GET(request: NextRequest) {
     const serviceTypeId = searchParams.get('serviceTypeId');
     const clientName = searchParams.get('clientName');
     const barberName = searchParams.get('barberName');
+    const q = searchParams.get('q');
 
     const where: Record<string, unknown> = {};
     where.barberId = searchParams.get('barberId') ?? undefined;
@@ -137,7 +138,17 @@ export async function GET(request: NextRequest) {
         where.status = status;
       }
     }
-    where.startAt = searchParams.get('startAt') ? { gte: searchParams.get('startAt')! } : undefined;
+    // Corrige filtro de data: se vier só a data (YYYY-MM-DD), converte para início do dia ISO
+    const startAtParam = searchParams.get('startAt');
+    if (startAtParam) {
+      let startAtIso = startAtParam;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(startAtParam)) {
+        startAtIso = new Date(startAtParam + 'T00:00:00').toISOString();
+      }
+      where.startAt = { gte: startAtIso };
+    } else {
+      where.startAt = undefined;
+    }
     where.endAt = searchParams.get('endAt') ? { lte: searchParams.get('endAt')! } : undefined;
 
     // Filtro por serviceTypeId (precisa filtrar por items)
@@ -145,13 +156,22 @@ export async function GET(request: NextRequest) {
       where.items = { some: { serviceTypeId } };
     }
 
-    // Filtro por nome do cliente (busca textual, case-insensitive)
-    if (clientName) {
-      where.client = { name: { contains: clientName, mode: 'insensitive' } };
-    }
-    // Filtro por nome do barbeiro (busca textual, case-insensitive)
-    if (barberName) {
-      where.barber = { name: { contains: barberName, mode: 'insensitive' } };
+    // Busca textual global (q)
+    if (q) {
+      where.OR = [
+        { client: { name: { contains: q, mode: 'insensitive' } } },
+        { barber: { name: { contains: q, mode: 'insensitive' } } },
+        { items: { some: { serviceType: { name: { contains: q, mode: 'insensitive' } } } } },
+      ];
+    } else {
+      // Filtro por nome do cliente (busca textual, case-insensitive)
+      if (clientName) {
+        where.client = { name: { contains: clientName, mode: 'insensitive' } };
+      }
+      // Filtro por nome do barbeiro (busca textual, case-insensitive)
+      if (barberName) {
+        where.barber = { name: { contains: barberName, mode: 'insensitive' } };
+      }
     }
 
     // Paginação

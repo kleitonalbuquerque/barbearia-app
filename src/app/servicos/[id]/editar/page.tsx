@@ -11,7 +11,7 @@ interface ServiceType {
 }
 
 export default function EditarServicoPage() {
-  const { fetchAuthed } = useAuth();
+  const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   const params = useParams();
   const router = useRouter();
   const serviceId = params?.id as string;
@@ -24,7 +24,7 @@ export default function EditarServicoPage() {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (!serviceId) return;
+    if (!serviceId || authLoading || !isAuthenticated) return;
     setLoading(true);
     fetch(`/api/services/${serviceId}`)
       .then((res) => res.json())
@@ -39,7 +39,7 @@ export default function EditarServicoPage() {
       })
       .catch(() => setError("Erro ao carregar serviço."))
       .finally(() => setLoading(false));
-  }, [serviceId]);
+  }, [serviceId, authLoading, isAuthenticated]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -76,6 +76,8 @@ export default function EditarServicoPage() {
     }
   }
 
+  if (authLoading) return <div className="p-8 text-center">Carregando...</div>;
+  if (!isAuthenticated) return <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
   if (loading) return <div className="p-8 text-center">Carregando...</div>;
   if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
   if (!service) return <div className="p-8 text-center">Serviço não encontrado.</div>;

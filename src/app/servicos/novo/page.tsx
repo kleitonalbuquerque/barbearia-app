@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function NovoServicoPage() {
-  const { fetchAuthed } = useAuth();
+  const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ name: "", priceCents: "", durationMinutes: "" });
   const [saving, setSaving] = useState(false);
@@ -51,10 +51,17 @@ export default function NovoServicoPage() {
     }
   }
 
+  if (authLoading) {
+    return <div className="p-8 text-center">Carregando...</div>;
+  }
+  if (!isAuthenticated) {
+    return <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
+  }
   return (
     <div className="max-w-lg mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6 text-white">Novo Serviço</h1>
       <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4">
+        {/* ...existing code... */}
         <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
         <input
           id="name"

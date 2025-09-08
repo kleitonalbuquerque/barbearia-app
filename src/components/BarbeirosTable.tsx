@@ -24,31 +24,31 @@ const BarbeirosTable: React.FC<BarbeirosTableProps> = ({ barbers }) => {
       key: "name",
       header: "Nome",
       render: (barber) => barber.name,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "email",
       header: "Email",
       render: (barber) => barber.email,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "phone",
       header: "Telefone",
       render: (barber) => barber.phone,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "cpf",
       header: "CPF",
       render: (barber) => barber.cpf,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "cnpj",
       header: "CNPJ",
       render: (barber) => barber.cnpj || "-",
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "detalhes",
@@ -66,7 +66,7 @@ const BarbeirosTable: React.FC<BarbeirosTableProps> = ({ barbers }) => {
           </button>
         </div>
       ),
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-800 dark:text-gray-200 font-semibold",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-800 dark:text-gray-200",
     },
   ];
 

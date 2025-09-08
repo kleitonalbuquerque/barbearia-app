@@ -11,7 +11,7 @@ type AdminUser = {
 };
 
 export default function UsuariosPage() {
-  const { fetchAuthed } = useAuth();
+  const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,15 +21,17 @@ export default function UsuariosPage() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    fetchAuthed("/api/users")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setUsers(data.users);
-        else setError(data.error || "Erro ao carregar usuários");
-      })
-      .catch(() => setError("Erro ao carregar usuários"))
-      .finally(() => setLoading(false));
-  }, [fetchAuthed, success]);
+    if (!authLoading && isAuthenticated) {
+      fetchAuthed("/api/users")
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) setUsers(data.users);
+          else setError(data.error || "Erro ao carregar usuários");
+        })
+        .catch(() => setError("Erro ao carregar usuários"))
+        .finally(() => setLoading(false));
+    }
+  }, [fetchAuthed, success, authLoading, isAuthenticated]);
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -62,8 +64,10 @@ export default function UsuariosPage() {
   }
 
   let content;
-  if (loading) {
+  if (authLoading || loading) {
     content = <div className="p-8 text-center">Carregando...</div>;
+  } else if (!isAuthenticated) {
+    content = <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
   } else if (error) {
     content = <div className="p-8 text-center text-red-600">{error}</div>;
   } else {
@@ -100,8 +104,9 @@ export default function UsuariosPage() {
           {showForm ? "Cancelar" : "Novo Admin"}
         </button>
       </div>
-      {showForm && (
+      {showForm && isAuthenticated && !authLoading && (
         <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4 mb-6">
+          {/* ...existing code... */}
           <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
           <input
             id="name"
