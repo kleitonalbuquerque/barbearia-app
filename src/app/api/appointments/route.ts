@@ -154,7 +154,16 @@ export async function GET(request: NextRequest) {
     } else {
       where.startAt = undefined;
     }
-    where.endAt = searchParams.get('endAt') ? { lte: searchParams.get('endAt')! } : undefined;
+    const endAtParam = searchParams.get('endAt');
+    if (endAtParam) {
+      let endAtIso = endAtParam;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(endAtParam)) {
+        endAtIso = new Date(endAtParam + 'T23:59:59.999').toISOString();
+      }
+      where.endAt = { lte: endAtIso };
+    } else {
+      where.endAt = undefined;
+    }
 
     // Filtro por serviceTypeId (precisa filtrar por items)
     if (serviceTypeId) {

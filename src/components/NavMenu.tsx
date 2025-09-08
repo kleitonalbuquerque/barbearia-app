@@ -8,7 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 const menuItems = [
-    { label: "Agendamentos", href: "/agendamentos" },
+    { label: (
+      <span className="flex items-center gap-1">
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <rect x="3" y="6" width="14" height="11" rx="2" className="fill-blue-600 dark:fill-blue-400"/>
+          <rect x="7" y="2" width="2" height="4" className="fill-blue-600 dark:fill-blue-400"/>
+          <rect x="11" y="2" width="2" height="4" className="fill-blue-600 dark:fill-blue-400"/>
+        </svg>
+        Agendamentos
+      </span>
+    ), href: "/agendamentos" },
     { label: "Sobre", href: "/sobre" },
     { label: "Clientes", href: "/clientes" },
     { label: "Barbeiros", href: "/barbeiros" },
