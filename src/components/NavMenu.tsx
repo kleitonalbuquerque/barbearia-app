@@ -1,6 +1,8 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const menuItems = [
   { label: "Dashboard", href: "/" },
@@ -13,25 +15,40 @@ const menuItems = [
 
 export default function NavMenu() {
   const pathname = usePathname();
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   return (
     <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between w-full">
+          {/* Mobile menu button */}
+          <button
+            className="lg:hidden flex items-center justify-center p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+            onClick={() => setDrawerOpen(!drawerOpen)}
+            aria-label="Abrir menu"
+          >
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <div className="flex items-center gap-6">
             <span className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">BarbeariaApp</span>
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`text-base font-medium px-2 py-1 rounded transition-colors ${
-                  pathname === item.href
-                    ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-gray-800"
-                    : "text-gray-700 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            <div className="hidden lg:flex items-center gap-6">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-base font-medium px-2 py-1 rounded transition-colors ${
+                    pathname === item.href
+                      ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-gray-800"
+                      : "text-gray-700 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
           <div className="flex items-center gap-4">
             {/* Admin dropdown/avatar */}
@@ -49,6 +66,51 @@ export default function NavMenu() {
           </div>
         </div>
       </div>
+      {/* Drawer menu para mobile/tablet */}
+      <div
+        className={`fixed inset-0 z-50 bg-black bg-opacity-40 transition-opacity ${drawerOpen ? "block" : "hidden"} lg:hidden`}
+        onClick={() => setDrawerOpen(false)}
+        aria-hidden="true"
+      />
+      <aside
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-50 transform transition-transform duration-200 ease-in-out ${drawerOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden`}
+        aria-label="Menu lateral"
+      >
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
+          <span className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">BarbeariaApp</span>
+          <button
+            className="p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={() => setDrawerOpen(false)}
+            aria-label="Fechar menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav className="flex flex-col gap-2 p-4">
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`text-base font-medium px-3 py-2 rounded transition-colors ${
+                pathname === item.href
+                  ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-gray-800"
+                  : "text-gray-700 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800"
+              }`}
+              onClick={() => setDrawerOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
+            <span className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Admin</span>
+            <Link href="/admin/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
+            <Link href="/admin/configuracoes" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Configurações</Link>
+            <button className="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Sair</button>
+          </div>
+        </nav>
+      </aside>
     </nav>
   );
 }

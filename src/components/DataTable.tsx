@@ -33,8 +33,8 @@ function DataTable<T>({
   }
 
   return (
-    <div className="overflow-x-auto rounded shadow">
-      <table className={tableClassName}>
+    <div className="overflow-x-auto rounded shadow max-w-full sm:max-w-none">
+      <table className={tableClassName + " min-w-[600px] sm:min-w-full"}>
         <thead>
           <tr>
             {columns.map((col) => (
