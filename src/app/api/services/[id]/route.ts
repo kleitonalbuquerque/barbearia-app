@@ -1,10 +1,17 @@
+function isValidUUID(uuid: string) {
+  return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(uuid);
+}
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
+// Removed duplicate isValidUUID function
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (!params || !params.id || !isValidUUID(params.id)) {
+      return NextResponse.json({ success: false, error: 'ID inválido.' }, { status: 400 });
+    }
     const body = await request.json();
     const { name, priceCents, durationMinutes } = body;
     if (!name || typeof priceCents !== 'number' || typeof durationMinutes !== 'number') {
@@ -20,11 +27,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { params } = context;
-    if (!params || !params.id) {
-      return NextResponse.json({ success: false, error: 'ID não informado.' }, { status: 400 });
+    if (!params || !params.id || !isValidUUID(params.id)) {
+      return NextResponse.json({ success: false, error: 'ID inválido.' }, { status: 400 });
     }
     const service = await prisma.serviceType.findUnique({ where: { id: params.id } });
     if (!service) {

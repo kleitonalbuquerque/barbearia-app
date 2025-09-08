@@ -17,6 +17,7 @@ export async function POST(request: Request) {
         name: data.name,
         priceCents: data.priceCents,
         durationMinutes: data.durationMinutes,
+        paymentAllowed: { set: ["CASH"] },
       },
     });
     return NextResponse.json({ success: true, message: 'Serviço criado com sucesso!', service });
