@@ -274,7 +274,7 @@ export default function BarbeiroDetalhePage() {
                 >
                   <option value="">Todos</option>
                   <option value="SCHEDULED">Agendado</option>
-                  <option value="CANCELLED">Cancelado</option>
+                  <option value="CANCELED">Cancelado</option>
                   <option value="COMPLETED">Concluído</option>
                 </select>
               </div>
