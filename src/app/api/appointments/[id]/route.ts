@@ -24,14 +24,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     const data = await request.json();
     const { payment, ...rest } = data;
+    // Se o status for CANCELED, remove o payment associado (se existir)
+    if (rest.status === 'CANCELED') {
+      await prisma.payment.deleteMany({ where: { appointmentId: params.id } });
+    }
     // Atualiza dados do agendamento
     const updated = await prisma.appointment.update({
       where: { id: params.id },
       data: rest,
       include: { items: true, payment: true }
     });
-    // Se houver alteração/criação de payment
-    if (payment) {
+    // Se houver alteração/criação de payment e não for cancelado
+    if (payment && rest.status !== 'CANCELED') {
       if (payment.update) {
         // Atualiza payment existente
         await prisma.payment.update({

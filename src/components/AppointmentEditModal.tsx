@@ -19,6 +19,7 @@ interface AppointmentEditModalProps {
   readonly paymentMethods: readonly string[];
 }
 
+
 export default function AppointmentEditModal({ isOpen, onClose, appointment, onSave, canEditStatus, paymentMethods }: AppointmentEditModalProps) {
   const [date, setDate] = useState<Date | null>(null);
   const [status, setStatus] = useState("");
@@ -39,6 +40,13 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
       setServicePrice(appointment.items?.[0]?.priceCentsSnapshot ? appointment.items[0].priceCentsSnapshot / 100 : 0);
     }
   }, [appointment, isOpen]);
+
+  // Limpa método de pagamento se status for CANCELLED
+  React.useEffect(() => {
+    if (status === "CANCELLED" && paymentMethod) {
+      setPaymentMethod("");
+    }
+  }, [status, paymentMethod]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -119,13 +127,14 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
             {/* Forma de pagamento */}
             <div>
               <label htmlFor="edit-payment-method" className="block text-sm font-semibold mb-1">Forma de pagamento</label>
-              <select
-                id="edit-payment-method"
-                className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={paymentMethod}
-                onChange={e => setPaymentMethod(e.target.value)}
-                required
-              >
+                <select
+                  id="edit-payment-method"
+                  className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={status === "CANCELED" ? "" : paymentMethod}
+                  onChange={e => setPaymentMethod(e.target.value)}
+                  required={status !== "CANCELED"}
+                  disabled={status === "CANCELED"}
+                >
                 <option value="">Selecione</option>
                 {paymentMethods.map((m) => (
                   <option key={m} value={m}>{m}</option>
@@ -138,13 +147,16 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
                 <select
                   id="edit-status"
                   className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
+                  value={status === "CANCELLED" ? "CANCELED" : status}
+                  onChange={e => {
+                    const val = e.target.value === "CANCELLED" ? "CANCELED" : e.target.value;
+                    setStatus(val);
+                  }}
                   required
                 >
                   <option value="SCHEDULED">Agendado</option>
                   <option value="COMPLETED">Concluído</option>
-                  <option value="CANCELLED">Cancelado</option>
+                  <option value="CANCELED">Cancelado</option>
                 </select>
               </div>
             )}
