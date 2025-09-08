@@ -95,8 +95,14 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
   }
 }
 
-// Deletar agendamento
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+// Deletar agendamento (compatível com Next.js 14+/Netlify/Vercel)
+export async function DELETE(request: NextRequest, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {
+  let params: { id: string };
+  if ('then' in context.params) {
+    params = await context.params;
+  } else {
+    params = context.params;
+  }
   try {
     await prisma.appointment.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true, message: 'Agendamento removido com sucesso!' });
