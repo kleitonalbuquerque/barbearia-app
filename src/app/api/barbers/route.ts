@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q');
+    const orderBy = searchParams.get('orderBy') || 'createdAt';
+    const orderDir = (searchParams.get('orderDir') as 'asc' | 'desc') || 'desc';
     const where = q
       ? {
           OR: [
@@ -59,7 +61,10 @@ export async function GET(request: NextRequest) {
           ],
         }
       : undefined;
-    const barbers = await prisma.barber.findMany({ where });
+    const barbers = await prisma.barber.findMany({
+      where,
+      orderBy: { [orderBy]: orderDir },
+    });
     return NextResponse.json({ success: true, barbers });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });

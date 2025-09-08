@@ -14,16 +14,18 @@ interface Barber {
 export default function BarbeirosPage() {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [search, setSearch] = useState("");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [orderDir, setOrderDir] = useState<"asc"|"desc">("desc");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/barbers?q=${encodeURIComponent(search)}`)
+    fetch(`/api/barbers?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
       .then((res) => res.json())
       .then((data) => setBarbers(data.barbers || []))
       .finally(() => setLoading(false));
-  }, [search]);
+  }, [search, orderBy, orderDir]);
 
   
   // Removed columns definition as BarbeirosTable handles it internally
@@ -39,12 +41,31 @@ export default function BarbeirosPage() {
           + Novo Barbeiro
         </button>
       </div>
-      <input
-        className="w-full p-3 text-base border border-gray-300 rounded mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-gray-900"
-        placeholder="Buscar por nome, e-mail, telefone ou CPF..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="flex flex-col md:flex-row gap-2 mb-6">
+        <input
+          className="w-full p-3 text-base border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-gray-900"
+          placeholder="Buscar por nome, e-mail, telefone ou CPF..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className="p-3 border border-gray-300 rounded text-gray-900 bg-gray-50"
+          value={orderBy}
+          onChange={e => setOrderBy(e.target.value)}
+        >
+          <option value="createdAt">Mais recente</option>
+          <option value="name">Nome</option>
+          <option value="email">Email</option>
+        </select>
+        <select
+          className="p-3 border border-gray-300 rounded text-gray-900 bg-gray-50"
+          value={orderDir}
+          onChange={e => setOrderDir(e.target.value as "asc"|"desc")}
+        >
+          <option value="desc">Desc</option>
+          <option value="asc">Asc</option>
+        </select>
+      </div>
       {loading ? (
         <p className="text-gray-700">Carregando...</p>
       ) : (

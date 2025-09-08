@@ -20,8 +20,29 @@ export default function NovoClientePage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  function validateEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function validateCPF(cpf: string) {
+    return /^\d{11}$/.test(cpf);
+  }
+  function validatePhone(phone: string) {
+    return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone);
+  }
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!validateEmail(form.email)) {
+      setError("E-mail inválido");
+      return;
+    }
+    if (!validateCPF(form.cpf)) {
+      setError("CPF deve ter 11 dígitos numéricos");
+      return;
+    }
+    if (!validatePhone(form.phone)) {
+      setError("Telefone inválido. Ex: (11) 99999-9999");
+      return;
+    }
     setLoading(true);
     setError("");
     setSuccess("");

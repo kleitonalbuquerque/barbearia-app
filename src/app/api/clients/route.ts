@@ -38,6 +38,8 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim();
+    const orderBy = searchParams.get('orderBy') || 'createdAt';
+    const orderDir = (searchParams.get('orderDir') as 'asc' | 'desc') || 'desc';
     let where = {};
     if (q) {
       where = {
@@ -49,7 +51,10 @@ export async function GET(request: Request) {
         ],
       };
     }
-    const clients = await prisma.client.findMany({ where });
+    const clients = await prisma.client.findMany({
+      where,
+      orderBy: { [orderBy]: orderDir },
+    });
     return NextResponse.json({ success: true, clients });
   } catch (error) {
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });
