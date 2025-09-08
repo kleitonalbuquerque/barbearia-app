@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +21,21 @@ export default function NavMenu() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
+  // Estado para dropdown Admin (desktop)
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const adminDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fecha dropdown ao clicar fora
+  useEffect(() => {
+    if (!adminDropdownOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (adminDropdownRef.current && !adminDropdownRef.current.contains(event.target as Node)) {
+        setAdminDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [adminDropdownOpen]);
 
   return (
     <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
@@ -57,16 +72,27 @@ export default function NavMenu() {
           <div className="flex items-center gap-4">
             {/* Menu condicional: Admin ou Entrar */}
             {isAuthenticated ? (
-              <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+              <div className="relative" ref={adminDropdownRef}>
+                <button
+                  className={
+                    "flex items-center gap-2 px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition focus:outline-none" +
+                    (adminDropdownOpen ? " ring-2 ring-blue-400" : "")
+                  }
+                  aria-haspopup="true"
+                  aria-expanded={adminDropdownOpen}
+                  onClick={() => setAdminDropdownOpen((open) => !open)}
+                  tabIndex={0}
+                >
                   <span className="hidden sm:inline">Admin</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
-                  <Link href="/admin/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Gerenciar Usuários</Link>
-                  <Link href="/admin/configuracoes" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Configurações</Link>
-                  <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => { logout(); router.push("/login"); }}>Sair</button>
-                </div>
+                {adminDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50 animate-fade-in">
+                    <Link href="/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Gerenciar Usuários</Link>
+                    <Link href="/admin/configuracoes" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Configurações</Link>
+                    <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => { setAdminDropdownOpen(false); logout(); router.push("/login"); }}>Sair</button>
+                  </div>
+                )}
               </div>
             ) : (
               <button
@@ -120,7 +146,7 @@ export default function NavMenu() {
           {isAuthenticated ? (
             <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
               <span className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Admin</span>
-              <Link href="/admin/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
+              <Link href="/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
               <Link href="/admin/configuracoes" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Configurações</Link>
               <button className="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded" onClick={() => { logout(); setDrawerOpen(false); router.push("/login"); }}>Sair</button>
             </div>
