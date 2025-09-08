@@ -57,6 +57,10 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
       // Monta startAt e endAt (duração padrão 1h)
       const startAt = new Date(`${form.date}T${form.time}`);
       const endAt = new Date(startAt.getTime() + 60 * 60 * 1000);
+      // Busca o valor correto do serviço selecionado
+      const servico = serviceTypes.find(s => s.id === form.serviceTypeId);
+      const priceCentsSnapshot = servico ? servico.priceCents : 0;
+      const durationMinutesSnapshot = 60; // pode ser ajustado se necessário
       const res = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +69,7 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
           clientId: form.clientId,
           startAt: startAt.toISOString(),
           endAt: endAt.toISOString(),
-          items: [{ serviceTypeId: form.serviceTypeId, priceCentsSnapshot: 0, durationMinutesSnapshot: 60 }]
+          items: [{ serviceTypeId: form.serviceTypeId, priceCentsSnapshot, durationMinutesSnapshot }]
         })
       });
       const data = await res.json();
