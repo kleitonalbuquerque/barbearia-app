@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 const menuItems = [
   { label: "Dashboard", href: "/" },
@@ -15,8 +18,9 @@ const menuItems = [
 
 export default function NavMenu() {
   const pathname = usePathname();
-
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const router = useRouter();
 
   return (
     <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
@@ -51,18 +55,28 @@ export default function NavMenu() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {/* Admin dropdown/avatar */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-                <span className="hidden sm:inline">Admin</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
-                <Link href="/admin/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Gerenciar Usuários</Link>
-                <Link href="/admin/configuracoes" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Configurações</Link>
-                <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Sair</button>
+            {/* Menu condicional: Admin ou Entrar */}
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button className="flex items-center gap-2 px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                  <span className="hidden sm:inline">Admin</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+                  <Link href="/admin/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Gerenciar Usuários</Link>
+                  <Link href="/admin/configuracoes" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Configurações</Link>
+                  <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => { logout(); router.push("/login"); }}>Sair</button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+                onClick={() => router.push("/login")}
+              >
+                <FontAwesomeIcon icon={faSignInAlt} />
+                <span className="hidden sm:inline">Entrar</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -103,12 +117,25 @@ export default function NavMenu() {
               {item.label}
             </Link>
           ))}
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-            <span className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Admin</span>
-            <Link href="/admin/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
-            <Link href="/admin/configuracoes" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Configurações</Link>
-            <button className="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Sair</button>
-          </div>
+          {isAuthenticated ? (
+            <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Admin</span>
+              <Link href="/admin/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
+              <Link href="/admin/configuracoes" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Configurações</Link>
+              <button className="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded" onClick={() => { logout(); setDrawerOpen(false); router.push("/login"); }}>Sair</button>
+            </div>
+          ) : (
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold transition w-full mt-4"
+              onClick={() => {
+                setDrawerOpen(false);
+                router.push("/login");
+              }}
+            >
+              <FontAwesomeIcon icon={faSignInAlt} />
+              <span className="hidden sm:inline">Entrar</span>
+            </button>
+          )}
         </nav>
       </aside>
     </nav>
