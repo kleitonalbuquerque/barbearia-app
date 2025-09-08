@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function NovoClientePage() {
+  const { fetchAuthed } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
@@ -23,18 +25,23 @@ export default function NovoClientePage() {
     setLoading(true);
     setError("");
     setSuccess("");
-    const res = await fetch("/api/clients", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (data.success) {
-      setSuccess("Cliente cadastrado com sucesso!");
-      setTimeout(() => router.push("/clientes"), 1200);
-    } else {
-      setError(data.error || "Erro ao cadastrar cliente.");
+    try {
+      const res = await fetchAuthed("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (data.success) {
+        setSuccess("Cliente cadastrado com sucesso!");
+        setTimeout(() => router.push("/clientes"), 1200);
+      } else {
+        setError(data.error || "Erro ao cadastrar cliente.");
+      }
+    } catch {
+      setLoading(false);
+      setError("Erro ao cadastrar cliente.");
     }
   }
 

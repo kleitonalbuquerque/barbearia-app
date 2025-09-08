@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function NovoBarbeiroPage() {
+  const { fetchAuthed } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -14,18 +16,23 @@ export default function NovoBarbeiroPage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetch("/api/barbers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (data.success) {
-      setSuccess("Barbeiro cadastrado com sucesso!");
-      setTimeout(() => router.push("/barbeiros"), 1200);
-    } else {
-      setError(data.error || "Erro ao cadastrar barbeiro.");
+    try {
+      const res = await fetchAuthed("/api/barbers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      setSaving(false);
+      if (data.success) {
+        setSuccess("Barbeiro cadastrado com sucesso!");
+        setTimeout(() => router.push("/barbeiros"), 1200);
+      } else {
+        setError(data.error || "Erro ao cadastrar barbeiro.");
+      }
+    } catch {
+      setSaving(false);
+      setError("Erro ao cadastrar barbeiro.");
     }
   }
 
