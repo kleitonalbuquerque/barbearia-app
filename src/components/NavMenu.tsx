@@ -8,12 +8,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 const menuItems = [
-  { label: "Dashboard", href: "/" },
-  { label: "Clientes", href: "/clientes" },
-  { label: "Barbeiros", href: "/barbeiros" },
-  { label: "Serviços", href: "/servicos" },
-  { label: "Agendamentos", href: "/agendamentos" },
-  { label: "Formas de Pagamento", href: "/pagamentos" },
+    { label: "Agendamentos", href: "/agendamentos" },
+    { label: "Dashboard", href: "/" },
+    { label: "Clientes", href: "/clientes" },
+    { label: "Barbeiros", href: "/barbeiros" },
+    { label: "Serviços", href: "/servicos" },
+    { label: "Formas de Pagamento", href: "/pagamentos" },
 ];
 
 export default function NavMenu() {
