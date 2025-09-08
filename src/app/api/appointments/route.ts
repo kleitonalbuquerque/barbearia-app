@@ -172,10 +172,15 @@ export async function GET(request: NextRequest) {
     const include: {
       items: { include: { serviceType: boolean } };
       barber?: boolean;
+      client?: { select: { id: true; name: true } };
     } = { items: { include: { serviceType: true } } };
     // Permitir incluir barbeiro se solicitado (para compatibilidade com frontend)
     if (searchParams.get('includeBarber') === 'true') {
       include.barber = true;
+    }
+    // Permitir incluir client se solicitado (para mostrar nome do cliente na tabela do barbeiro)
+    if (searchParams.get('includeClient') === 'true') {
+      include.client = { select: { id: true, name: true } };
     }
     const appointments = await prisma.appointment.findMany({
       where,

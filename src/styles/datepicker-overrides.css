@@ -1,0 +1,21 @@
+/* Forçar fundo branco no calendário do datepicker */
+.react-datepicker__month-container,
+.react-datepicker__header,
+.react-datepicker__day,
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__day--today {
+  background-color: #fff !important;
+  color: #222 !important;
+}
+.react-datepicker__day--selected {
+  background-color: #2563eb !important;
+  color: #fff !important;
+}
+.react-datepicker__day--keyboard-selected {
+  background-color: #dbeafe !important;
+  color: #222 !important;
+}
+.react-datepicker__day--today {
+  border: 1px solid #2563eb !important;
+}

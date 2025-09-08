@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import TailwindDatePicker from "@/components/TailwindDatePicker";
+
 import { useParams, useRouter } from "next/navigation";
 import AgendamentosTable from "@/components/AgendamentosTable";
 
-interface Client {
+interface Barber {
   id: string;
   name: string;
   email: string;
@@ -26,7 +28,7 @@ interface Appointment {
   status: string;
   items: AppointmentItem[];
   payment?: Payment;
-  barber?: { name: string };
+  client?: { name: string };
 }
 
 interface Payment {
@@ -36,11 +38,11 @@ interface Payment {
   paidAt: string;
 }
 
-export default function ClienteDetalhePage() {
+export default function BarbeiroDetalhePage() {
   const params = useParams();
   const router = useRouter();
-  const clientId = params?.id as string;
-  const [client, setClient] = useState<Client | null>(null);
+  const barberId = params?.id as string;
+  const [barber, setBarber] = useState<Barber | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -48,26 +50,31 @@ export default function ClienteDetalhePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  // Filtros
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [date, setDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   useEffect(() => {
-    if (!clientId) return;
+    if (!barberId) return;
     setLoading(true);
     Promise.all([
-      fetch(`/api/clients/${clientId}`).then((res) => res.json()),
-      fetch(`/api/appointments?clientId=${clientId}&page=1&pageSize=50&includeBarber=true&includeServiceType=true`).then((res) => res.json()),
+      fetch(`/api/barbers/${barberId}`).then((res) => res.json()),
+      fetch(`/api/appointments?barberId=${barberId}&page=1&pageSize=50&includeClient=true&includeServiceType=true`).then((res) => res.json()),
     ])
-      .then(([clientData, appointmentsData]) => {
-        setClient(clientData.client || null);
+      .then(([barberData, appointmentsData]) => {
+        setBarber(barberData.barber || null);
         setAppointments(appointmentsData.appointments || []);
         setForm({
-          name: clientData.client?.name || "",
-          email: clientData.client?.email || "",
-          phone: clientData.client?.phone || "",
-          cpf: clientData.client?.cpf || "",
+          name: barberData.barber?.name || "",
+          email: barberData.barber?.email || "",
+          phone: barberData.barber?.phone || "",
+          cpf: barberData.barber?.cpf || "",
         });
       })
       .finally(() => setLoading(false));
-  }, [clientId]);
+  }, [barberId]);
 
   function handleEdit() {
     setEditMode(true);
@@ -77,12 +84,12 @@ export default function ClienteDetalhePage() {
 
   function handleCancel() {
     setEditMode(false);
-    if (client) {
+    if (barber) {
       setForm({
-        name: client.name,
-        email: client.email,
-        phone: client.phone,
-        cpf: client.cpf,
+        name: barber.name,
+        email: barber.email,
+        phone: barber.phone,
+        cpf: barber.cpf,
       });
     }
     setError("");
@@ -94,7 +101,7 @@ export default function ClienteDetalhePage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetch(`/api/clients/${clientId}`, {
+    const res = await fetch(`/api/barbers/${barberId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -103,10 +110,28 @@ export default function ClienteDetalhePage() {
     setSaving(false);
     if (data.success) {
       setSuccess("Dados atualizados com sucesso!");
-      setClient({ ...client!, ...form });
+      setBarber({ ...barber!, ...form });
       setEditMode(false);
     } else {
-      setError(data.error || "Erro ao atualizar cliente.");
+      setError(data.error || "Erro ao atualizar barbeiro.");
+    }
+  }
+
+  async function handleDelete() {
+    if (!confirm("Tem certeza que deseja excluir este barbeiro?")) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    const res = await fetch(`/api/barbers/${barberId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    setSaving(false);
+    if (data.success) {
+      setSuccess("Barbeiro excluído com sucesso!");
+      setTimeout(() => router.push("/barbeiros"), 1200);
+    } else {
+      setError(data.error || "Erro ao excluir barbeiro.");
     }
   }
 
@@ -114,14 +139,24 @@ export default function ClienteDetalhePage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  // Filtros locais (mock, depois pode ser server-side)
+  const filteredAppointments = appointments.filter((a) => {
+    let ok = true;
+    if (statusFilter && a.status !== statusFilter) ok = false;
+    if (date && a.startAt.slice(0, 10) !== date?.toISOString().slice(0, 10)) ok = false;
+    if (startDate && a.startAt.slice(0, 10) < startDate.toISOString().slice(0, 10)) ok = false;
+    if (endDate && a.startAt.slice(0, 10) > endDate.toISOString().slice(0, 10)) ok = false;
+    return ok;
+  });
+
   let conteudo;
   if (loading) {
     conteudo = <p>Carregando...</p>;
-  } else if (client) {
+  } else if (barber) {
     conteudo = (
       <>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Cliente: {client.name}</h1>
+          <h1 className="text-2xl font-bold text-white">Barbeiro: {barber.name}</h1>
           <div className="flex gap-2">
             {editMode ? (
               <>
@@ -147,6 +182,13 @@ export default function ClienteDetalhePage() {
                   onClick={handleEdit}
                 >
                   Editar
+                </button>
+                <button
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded shadow transition"
+                  onClick={handleDelete}
+                  disabled={saving}
+                >
+                  Excluir
                 </button>
                 <button
                   className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-semibold px-4 py-2 rounded shadow transition"
@@ -202,26 +244,69 @@ export default function ClienteDetalhePage() {
             </form>
           ) : (
             <>
-              <strong>Email:</strong> {client.email} <br />
-              <strong>Telefone:</strong> {client.phone} <br />
-              <strong>CPF:</strong> {client.cpf}
+              <strong>Email:</strong> {barber.email} <br />
+              <strong>Telefone:</strong> {barber.phone} <br />
+              <strong>CPF:</strong> {barber.cpf}
               <hr className="my-4 border-gray-300 dark:border-gray-700" />
             </>
           )}
         </section>
         <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
             <h2 className="text-lg font-semibold text-white">Serviços realizados/cancelados</h2>
             <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
               Serviços concluídos: {appointments.filter(a => a.status === 'COMPLETED' || a.status === 'CONCLUÍDO').length}
             </span>
           </div>
-          <AgendamentosTable appointments={appointments} context="client" />
+          <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-col">
+              <label htmlFor="statusFilter" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Filtrar por status</label>
+              <select
+                id="statusFilter"
+                className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+              >
+                <option value="">Todos</option>
+                <option value="SCHEDULED">Agendado</option>
+                <option value="CANCELLED">Cancelado</option>
+                <option value="COMPLETED">Concluído</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="date" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Buscar por data</label>
+              <TailwindDatePicker
+                id="date"
+                value={date}
+                onChange={setDate}
+                placeholder="Selecione a data"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="startDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data início</label>
+              <TailwindDatePicker
+                id="startDate"
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="Data início"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="endDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data fim</label>
+              <TailwindDatePicker
+                id="endDate"
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="Data fim"
+              />
+            </div>
+          </div>
+          <AgendamentosTable appointments={filteredAppointments} context="barber" />
         </section>
       </>
     );
   } else {
-    conteudo = <p>Cliente não encontrado.</p>;
+    conteudo = <p>Barbeiro não encontrado.</p>;
   }
 
   return (
