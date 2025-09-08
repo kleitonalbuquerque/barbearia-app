@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DataTable, { DataTableColumn } from "@/components/DataTable";
+import BarbeirosTable from "@/components/BarbeirosTable";
 
 interface Barber {
   id: string;
@@ -25,32 +25,8 @@ export default function BarbeirosPage() {
       .finally(() => setLoading(false));
   }, [search]);
 
-  const columns: DataTableColumn<Barber>[] = [
-    {
-      key: "name",
-      header: "Nome",
-      render: (barber) => barber.name,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "email",
-      header: "Email",
-      render: (barber) => barber.email,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "phone",
-      header: "Telefone",
-      render: (barber) => barber.phone,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "cpf",
-      header: "CPF",
-      render: (barber) => barber.cpf,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-  ];
+  
+  // Removed columns definition as BarbeirosTable handles it internally
 
   return (
     <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
@@ -72,14 +48,7 @@ export default function BarbeirosPage() {
       {loading ? (
         <p className="text-gray-700">Carregando...</p>
       ) : (
-        <DataTable
-          columns={columns}
-          data={barbers}
-          emptyMessage="Nenhum barbeiro encontrado."
-          rowKey={(row) => row.id}
-          tableClassName="min-w-full bg-white dark:bg-gray-900"
-          onRowClick={(barber) => router.push(`/barbeiros/${barber.id}`)}
-        />
+        <BarbeirosTable barbers={barbers} />
       )}
     </div>
   );

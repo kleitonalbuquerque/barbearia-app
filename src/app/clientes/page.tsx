@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DataTable, { DataTableColumn } from "@/components/DataTable";
+import ClientesTable from "@/components/ClientesTable";
 
 interface Client {
   id: string;
@@ -25,32 +25,7 @@ export default function ClientesPage() {
       .finally(() => setLoading(false));
   }, [search]);
 
-  const columns: DataTableColumn<Client>[] = [
-    {
-      key: "name",
-      header: "Nome",
-      render: (client) => client.name,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "email",
-      header: "Email",
-      render: (client) => client.email,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "phone",
-      header: "Telefone",
-      render: (client) => client.phone,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-    {
-      key: "cpf",
-      header: "CPF",
-      render: (client) => client.cpf,
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
-    },
-  ];
+
 
   return (
     <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
@@ -72,14 +47,7 @@ export default function ClientesPage() {
       {loading ? (
         <p className="text-gray-700">Carregando...</p>
       ) : (
-        <DataTable
-          columns={columns}
-          data={clients}
-          emptyMessage="Nenhum cliente encontrado."
-          rowKey={(row) => row.id}
-          tableClassName="min-w-full bg-white dark:bg-gray-900"
-          onRowClick={(client) => router.push(`/clientes/${client.id}`)}
-        />
+  <ClientesTable clients={clients} />
       )}
     </div>
   );
