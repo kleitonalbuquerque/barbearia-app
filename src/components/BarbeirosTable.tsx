@@ -10,6 +10,7 @@ interface Barber {
   email: string;
   phone: string;
   cpf: string;
+  cnpj?: string | null;
 }
 
 interface BarbeirosTableProps {
@@ -41,6 +42,12 @@ const BarbeirosTable: React.FC<BarbeirosTableProps> = ({ barbers }) => {
       key: "cpf",
       header: "CPF",
       render: (barber) => barber.cpf,
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
+    },
+    {
+      key: "cnpj",
+      header: "CNPJ",
+      render: (barber) => barber.cnpj || "-",
       className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold",
     },
     {

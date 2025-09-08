@@ -5,14 +5,42 @@ import { useRouter } from "next/navigation";
 
 export default function NovoBarbeiroPage() {
   const { fetchAuthed } = useAuth();
-  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "", cnpj: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
 
+  function validateEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function validateCPF(cpf: string) {
+    return /^\d{11}$/.test(cpf);
+  }
+  function validateCNPJ(cnpj: string) {
+    return cnpj === '' || /^\d{14}$/.test(cnpj);
+  }
+  function validatePhone(phone: string) {
+    return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone);
+  }
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!validateEmail(form.email)) {
+      setError("E-mail inválido");
+      return;
+    }
+    if (!validateCPF(form.cpf)) {
+      setError("CPF deve ter 11 dígitos numéricos");
+      return;
+    }
+    if (!validateCNPJ(form.cnpj)) {
+      setError("CNPJ deve ter 14 dígitos numéricos ou estar vazio");
+      return;
+    }
+    if (!validatePhone(form.phone)) {
+      setError("Telefone inválido. Ex: (11) 99999-9999");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess("");
@@ -20,7 +48,7 @@ export default function NovoBarbeiroPage() {
       const res = await fetchAuthed("/api/barbers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, cnpj: form.cnpj || undefined }),
       });
       const data = await res.json();
       setSaving(false);
@@ -75,6 +103,13 @@ export default function NovoBarbeiroPage() {
           value={form.cpf}
           onChange={handleChange}
           required
+        />
+        <input
+          className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+          name="cnpj"
+          placeholder="CNPJ (opcional)"
+          value={form.cnpj}
+          onChange={handleChange}
         />
         <button
           type="submit"
