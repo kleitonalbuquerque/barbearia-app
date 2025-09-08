@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -13,6 +13,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<{ id: string; email: string; role: string } | null>(null);
+  // Restaurar sessão do cookie ao carregar
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.user) setUser(data.user);
+      });
+  }, []);
   const isAuthenticated = !!user;
 
   async function login(email: string, password: string) {
