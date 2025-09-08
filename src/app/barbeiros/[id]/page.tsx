@@ -262,47 +262,63 @@ export default function BarbeiroDetalhePage() {
               Serviços concluídos: {appointments.filter(a => a.status === 'COMPLETED' || a.status === 'CONCLUÍDO').length}
             </span>
           </div>
-          <div className="flex flex-wrap gap-2 mb-4">
-            <div className="flex flex-col">
-              <label htmlFor="statusFilter" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Filtrar por status</label>
-              <select
-                id="statusFilter"
-                className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
+          <div className="flex flex-wrap gap-2 mb-4 items-end justify-between">
+            <div className="flex flex-wrap gap-2 items-end">
+              <div className="flex flex-col">
+                <label htmlFor="statusFilter" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Filtrar por status</label>
+                <select
+                  id="statusFilter"
+                  className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={statusFilter}
+                  onChange={e => setStatusFilter(e.target.value)}
+                >
+                  <option value="">Todos</option>
+                  <option value="SCHEDULED">Agendado</option>
+                  <option value="CANCELLED">Cancelado</option>
+                  <option value="COMPLETED">Concluído</option>
+                </select>
+              </div>
+              <div className="flex flex-col">
+                <label htmlFor="date" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Buscar por data</label>
+                <TailwindDatePicker
+                  id="date"
+                  value={date}
+                  onChange={setDate}
+                  placeholder="Selecione a data"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label htmlFor="startDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data início</label>
+                <TailwindDatePicker
+                  id="startDate"
+                  value={startDate}
+                  onChange={setStartDate}
+                  placeholder="Data início"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label htmlFor="endDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data fim</label>
+                <TailwindDatePicker
+                  id="endDate"
+                  value={endDate}
+                  onChange={setEndDate}
+                  placeholder="Data fim"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col justify-end">
+              <button
+                type="button"
+                className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-semibold px-4 py-2 rounded shadow transition"
+                onClick={() => {
+                  setStatusFilter("");
+                  setDate(null);
+                  setStartDate(null);
+                  setEndDate(null);
+                }}
               >
-                <option value="">Todos</option>
-                <option value="SCHEDULED">Agendado</option>
-                <option value="CANCELLED">Cancelado</option>
-                <option value="COMPLETED">Concluído</option>
-              </select>
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="date" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Buscar por data</label>
-              <TailwindDatePicker
-                id="date"
-                value={date}
-                onChange={setDate}
-                placeholder="Selecione a data"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="startDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data início</label>
-              <TailwindDatePicker
-                id="startDate"
-                value={startDate}
-                onChange={setStartDate}
-                placeholder="Data início"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="endDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data fim</label>
-              <TailwindDatePicker
-                id="endDate"
-                value={endDate}
-                onChange={setEndDate}
-                placeholder="Data fim"
-              />
+                Limpar filtros
+              </button>
             </div>
           </div>
           <AgendamentosTable
