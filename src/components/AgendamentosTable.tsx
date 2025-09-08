@@ -125,10 +125,16 @@ function getColumns(context: "client" | "barber" = "barber"): DataTableColumn<Ap
     {
       key: "pagamento",
       header: "Forma de Pagamento",
-      render: (appt) =>
-        appt.payment
-          ? appt.payment.method
-          : "-",
+      render: (appt) => {
+        if (!appt.payment) return "-";
+        switch (appt.payment.method) {
+          case "PIX": return "PIX";
+          case "CREDIT": return "Crédito";
+          case "DEBIT": return "Débito";
+          case "CASH": return "Dinheiro";
+          default: return appt.payment.method;
+        }
+      },
       className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
     },
   ];
