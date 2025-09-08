@@ -4,6 +4,7 @@ import TailwindDatePicker from "@/components/TailwindDatePicker";
 
 import { useParams, useRouter } from "next/navigation";
 import AgendamentosTable from "@/components/AgendamentosTable";
+import AppointmentEditModal from "@/components/AppointmentEditModal";
 
 interface Barber {
   id: string;
@@ -38,6 +39,8 @@ interface Payment {
   paidAt: string;
 }
 
+const PAYMENT_METHODS = ["CASH", "PIX", "CREDIT", "DEBIT"];
+
 export default function BarbeiroDetalhePage() {
   const params = useParams();
   const router = useRouter();
@@ -45,6 +48,7 @@ export default function BarbeiroDetalhePage() {
   const [barber, setBarber] = useState<Barber | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editAppointment, setEditAppointment] = useState<Appointment | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
   const [saving, setSaving] = useState(false);
@@ -301,7 +305,78 @@ export default function BarbeiroDetalhePage() {
               />
             </div>
           </div>
-          <AgendamentosTable appointments={filteredAppointments} context="barber" />
+          <AgendamentosTable
+            appointments={filteredAppointments}
+            context="barber"
+            onRowClick={(appt) => setEditAppointment(appt)}
+          />
+          {editAppointment && (
+            <AppointmentEditModal
+              isOpen={!!editAppointment}
+              onClose={() => setEditAppointment(null)}
+              appointment={editAppointment}
+              canEditStatus={!["COMPLETED", "CANCELLED"].includes(editAppointment.status)}
+              paymentMethods={PAYMENT_METHODS}
+              onSave={async (data) => {
+              // Validação de conflito de datas
+              if (data.date && editAppointment) {
+                const startAt = data.date.toISOString();
+                const endAt = new Date(data.date.getTime() + (editAppointment.items?.[0]?.durationMinutesSnapshot || 30) * 60000).toISOString();
+                // Checar conflito (ignorar o próprio agendamento)
+                const res = await fetch(`/api/appointments?barberId=${barberId}&startAt=${startAt}&endAt=${endAt}`);
+                const result = await res.json();
+                if (result.appointments && result.appointments.some((appt: Appointment) => appt.id !== editAppointment.id)) {
+                  throw new Error("Conflito de horário para o barbeiro neste período.");
+                }
+              }
+              // Salvar edição
+              if (editAppointment) {
+                const body: {
+                  startAt: string;
+                  status: string;
+                  payment?: {
+                    update?: { method: string };
+                    create?: { method: string; amountCents: number };
+                  };
+                } = {
+                  startAt: data.date ? data.date.toISOString() : editAppointment.startAt,
+                  status: data.status,
+                };
+                // Só envie payment se realmente for criar/alterar
+                if (
+                  (editAppointment.payment && data.paymentMethod && data.paymentMethod !== editAppointment.payment.method) ||
+                  (!editAppointment.payment && data.paymentMethod)
+                ) {
+                  body.payment = editAppointment.payment && editAppointment.payment.id
+                    ? { update: { method: data.paymentMethod } }
+                    : { create: { method: data.paymentMethod, amountCents: 0 } };
+                }
+                const res = await fetch(`/api/appointments/${editAppointment.id}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(body),
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.message || "Erro ao salvar agendamento.");
+                // Atualizar lista local
+                setAppointments((prev) => prev.map((a) => {
+                  if (a.id !== editAppointment.id) return a;
+                  let updatedPayment = a.payment;
+                  if (a.payment && data.paymentMethod) {
+                    updatedPayment = { ...a.payment, method: data.paymentMethod, id: a.payment.id };
+                  }
+                  return {
+                    ...a,
+                    startAt: data.date ? data.date.toISOString() : a.startAt,
+                    payment: updatedPayment,
+                    status: data.status || a.status,
+                  };
+                }));
+                setEditAppointment(null);
+              }
+            }}
+          />
+          )}
         </section>
       </>
     );

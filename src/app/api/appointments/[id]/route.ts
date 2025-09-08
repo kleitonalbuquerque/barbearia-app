@@ -23,12 +23,37 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const data = await request.json();
+    const { payment, ...rest } = data;
+    // Atualiza dados do agendamento
     const updated = await prisma.appointment.update({
       where: { id: params.id },
-      data,
-      include: { items: true }
+      data: rest,
+      include: { items: true, payment: true }
     });
-    return NextResponse.json({ success: true, message: 'Agendamento atualizado com sucesso!', appointment: updated });
+    // Se houver alteração/criação de payment
+    if (payment) {
+      if (payment.update) {
+        // Atualiza payment existente
+        await prisma.payment.update({
+          where: { appointmentId: params.id },
+          data: payment.update,
+        });
+      } else if (payment.create) {
+        // Cria payment se não existir
+        await prisma.payment.create({
+          data: {
+            ...payment.create,
+            appointmentId: params.id,
+          },
+        });
+      }
+    }
+    // Retorna agendamento atualizado com payment
+    const result = await prisma.appointment.findUnique({
+      where: { id: params.id },
+      include: { items: true, payment: true }
+    });
+    return NextResponse.json({ success: true, message: 'Agendamento atualizado com sucesso!', appointment: result });
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }

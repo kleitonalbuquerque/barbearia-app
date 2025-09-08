@@ -16,7 +16,7 @@ interface Payment {
   paidAt: string;
 }
 
-interface Appointment {
+export interface Appointment {
   id: string;
   startAt: string;
   endAt: string;
@@ -52,6 +52,7 @@ interface AgendamentosTableProps {
   emptyServiceMessageClient?: string;
   emptyServiceMessageBarber?: string;
   context?: "client" | "barber";
+  onRowClick?: (appt: Appointment) => void;
 }
 
 function getColumns(context: "client" | "barber" = "barber"): DataTableColumn<Appointment>[] {
@@ -126,19 +127,20 @@ function getColumns(context: "client" | "barber" = "barber"): DataTableColumn<Ap
       header: "Forma de Pagamento",
       render: (appt) =>
         appt.payment
-          ? `${appt.payment.method} (${(appt.payment.amountCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })})`
+          ? appt.payment.method
           : "-",
       className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
     },
   ];
 }
 
-const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageBarber = "Nenhum serviço agendado para este barbeiro.", context = "barber" }) => (
+const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageBarber = "Nenhum serviço agendado para este barbeiro.", context = "barber", onRowClick }) => (
   <DataTable
     columns={getColumns(context)}
     data={appointments}
     emptyMessage={context === "client" ? emptyServiceMessageClient : emptyServiceMessageBarber}
     rowKey={(row) => row.id}
+    onRowClick={onRowClick}
   />
 );
 export default AgendamentosTable;
