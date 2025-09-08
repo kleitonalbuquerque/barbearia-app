@@ -4,7 +4,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Buscar cliente por ID
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: { id: string } }) {
+  const { params } = context;
   try {
     const client = await prisma.client.findUnique({ where: { id: params.id } });
     if (!client) {
@@ -17,7 +18,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Atualizar cliente
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: { id: string } }) {
+  const { params } = context;
   try {
     const data = await request.json();
     const updatedClient = await prisma.client.update({
@@ -31,7 +33,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // Deletar cliente
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
+  const { params } = context;
   try {
     await prisma.client.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });

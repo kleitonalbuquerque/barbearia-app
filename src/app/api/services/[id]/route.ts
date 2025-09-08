@@ -7,9 +7,10 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 // Removed duplicate isValidUUID function
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!params || !params.id || !isValidUUID(params.id)) {
+    const { id } = await params;
+    if (!id || !isValidUUID(id)) {
       return NextResponse.json({ success: false, error: 'ID inválido.' }, { status: 400 });
     }
     const body = await request.json();
@@ -18,7 +19,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ success: false, error: 'Dados inválidos.' }, { status: 400 });
     }
     const updated = await prisma.serviceType.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, priceCents, durationMinutes },
     });
     return NextResponse.json({ success: true, service: updated });
@@ -27,12 +28,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!params || !params.id || !isValidUUID(params.id)) {
+    const { id } = await params;
+    if (!id || !isValidUUID(id)) {
       return NextResponse.json({ success: false, error: 'ID inválido.' }, { status: 400 });
     }
-    const service = await prisma.serviceType.findUnique({ where: { id: params.id } });
+    const service = await prisma.serviceType.findUnique({ where: { id } });
     if (!service) {
       return NextResponse.json({ success: false, error: 'Serviço não encontrado' }, { status: 404 });
     }

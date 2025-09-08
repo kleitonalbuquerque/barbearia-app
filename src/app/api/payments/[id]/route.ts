@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 
 // GET /api/payments/[id] - Buscar pagamento por ID
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const payment = await prisma.payment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { appointment: true },
     });
     if (!payment) {
@@ -18,11 +19,12 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 // PUT /api/payments/[id] - Atualizar pagamento
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const data = await req.json();
     const payment = await prisma.payment.update({
-      where: { id: params.id },
+      where: { id },
       data,
     });
     return NextResponse.json({ success: true, message: 'Pagamento atualizado com sucesso!', payment });
@@ -32,9 +34,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE /api/payments/[id] - Deletar pagamento
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.payment.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.payment.delete({ where: { id } });
     return NextResponse.json({ success: true, message: 'Pagamento deletado com sucesso!' });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Erro ao deletar pagamento', error }, { status: 500 });

@@ -5,7 +5,8 @@ import { requireSuperadmin } from '../../barbers/utils';
 const prisma = new PrismaClient();
 
 // Buscar tipo de serviço por ID
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: { id: string } }) {
+  const { params } = context;
   try {
     const serviceType = await prisma.serviceType.findUnique({ where: { id: params.id } });
     if (!serviceType) {
@@ -18,7 +19,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Atualizar tipo de serviço
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+  const { params } = context;
   const auth = await requireSuperadmin(request);
   if (auth) return auth;
   try {
@@ -34,7 +36,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Deletar tipo de serviço
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+  const { params } = context;
   const auth = await requireSuperadmin(request);
   if (auth) return auth;
   try {
