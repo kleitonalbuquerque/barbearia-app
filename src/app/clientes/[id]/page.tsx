@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useParams, useRouter } from "next/navigation";
 import AgendamentosTable from "@/components/AgendamentosTable";
 
@@ -37,6 +38,7 @@ interface Payment {
 }
 
 export default function ClienteDetalhePage() {
+  const { fetchAuthed } = useAuth();
   const params = useParams();
   const router = useRouter();
   const clientId = params?.id as string;
@@ -94,19 +96,47 @@ export default function ClienteDetalhePage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetch(`/api/clients/${clientId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (data.success) {
-      setSuccess("Dados atualizados com sucesso!");
-      setClient({ ...client!, ...form });
-      setEditMode(false);
-    } else {
-      setError(data.error || "Erro ao atualizar cliente.");
+    try {
+      const res = await fetchAuthed(`/api/clients/${clientId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      setSaving(false);
+      if (data.success) {
+        setSuccess("Dados atualizados com sucesso!");
+        setClient({ ...client!, ...form });
+        setEditMode(false);
+      } else {
+        setError(data.error || "Erro ao atualizar cliente.");
+      }
+    } catch {
+      setSaving(false);
+      setError("Erro ao atualizar cliente.");
+    }
+  }
+
+  async function handleDelete() {
+    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetchAuthed(`/api/clients/${clientId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setSaving(false);
+      if (data.success) {
+        setSuccess("Cliente excluído com sucesso!");
+        setTimeout(() => router.push("/clientes"), 1200);
+      } else {
+        setError(data.error || "Erro ao excluir cliente.");
+      }
+    } catch {
+      setSaving(false);
+      setError("Erro ao excluir cliente.");
     }
   }
 
@@ -147,6 +177,13 @@ export default function ClienteDetalhePage() {
                   onClick={handleEdit}
                 >
                   Editar
+                </button>
+                <button
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded shadow transition"
+                  onClick={handleDelete}
+                  disabled={saving}
+                >
+                  Excluir
                 </button>
                 <button
                   className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-semibold px-4 py-2 rounded shadow transition"

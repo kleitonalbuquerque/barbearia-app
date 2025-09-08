@@ -3,29 +3,52 @@ import React, { createContext, useContext, useState, ReactNode, useMemo } from "
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: { id: string; email: string; role: string } | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  fetchAuthed: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<{ id: string; email: string; role: string } | null>(null);
+  const isAuthenticated = !!user;
 
   async function login(email: string, password: string) {
-    // Simulação: autenticação fake
-    if (email === "admin@admin.com" && password === "admin") {
-      setIsAuthenticated(true);
-      return true;
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        setUser(data.user);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    return false;
   }
 
   function logout() {
-    setIsAuthenticated(false);
+    setUser(null);
   }
 
-  const value = useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated]);
+  // Helper para fetch autenticado
+  const fetchAuthed = React.useCallback(
+    async (input: RequestInfo, init: RequestInit = {}) => {
+      if (!user?.email) throw new Error("Usuário não autenticado");
+      const headers = new Headers(init.headers || {});
+      headers.set("Authorization", `Bearer ${user.email}`);
+      return fetch(input, { ...init, headers });
+    },
+    [user]
+  );
+
+  const value = useMemo(() => ({ isAuthenticated, user, login, logout, fetchAuthed }), [isAuthenticated, user, fetchAuthed]);
   return (
     <AuthContext.Provider value={value}>
       {children}

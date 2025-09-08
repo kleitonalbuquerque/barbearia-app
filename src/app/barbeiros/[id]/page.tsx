@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 
 import { useParams, useRouter } from "next/navigation";
@@ -42,6 +43,7 @@ interface Payment {
 const PAYMENT_METHODS = ["CASH", "PIX", "CREDIT", "DEBIT"];
 
 export default function BarbeiroDetalhePage() {
+  const { fetchAuthed } = useAuth();
   const params = useParams();
   const router = useRouter();
   const barberId = params?.id as string;
@@ -105,7 +107,7 @@ export default function BarbeiroDetalhePage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetch(`/api/barbers/${barberId}`, {
+    const res = await fetchAuthed(`/api/barbers/${barberId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -126,16 +128,21 @@ export default function BarbeiroDetalhePage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetch(`/api/barbers/${barberId}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (data.success) {
-      setSuccess("Barbeiro excluído com sucesso!");
-      setTimeout(() => router.push("/barbeiros"), 1200);
-    } else {
-      setError(data.error || "Erro ao excluir barbeiro.");
+    try {
+      const res = await fetchAuthed(`/api/barbers/${barberId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setSaving(false);
+      if (data.success) {
+        setSuccess("Barbeiro excluído com sucesso!");
+        setTimeout(() => router.push("/barbeiros"), 1200);
+      } else {
+        setError(data.error || "Erro ao excluir barbeiro.");
+      }
+    } catch (err) {
+      setSaving(false);
+      setError("Erro ao excluir barbeiro.");
     }
   }
 
