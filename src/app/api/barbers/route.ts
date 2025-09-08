@@ -45,9 +45,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const barbers = await prisma.barber.findMany();
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get('q');
+    const where = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' } },
+            { email: { contains: q, mode: 'insensitive' } },
+            { phone: { contains: q, mode: 'insensitive' } },
+            { cpf: { contains: q, mode: 'insensitive' } },
+          ],
+        }
+      : undefined;
+    const barbers = await prisma.barber.findMany({ where });
     return NextResponse.json({ success: true, barbers });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
