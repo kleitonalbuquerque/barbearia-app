@@ -54,16 +54,13 @@ function DataTable<T>({
           {data.map((row, idx) => (
             <tr
               key={rowKey ? rowKey(row) : idx}
-              className={
-                "hover:bg-blue-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800" +
-                (onRowClick ? " cursor-pointer" : "")
-              }
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              className="group border-b border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-gray-800"
+              // Clique de navegação deve ser controlado explicitamente via botão/ícone na coluna de detalhes
             >
               {columns.map((col) => (
                 <td
                   key={col.key}
-                  className="px-4 py-3 text-gray-700 dark:text-gray-300"
+                  className={col.className ? col.className.replace(/bg-[^\s]+/g, "") : "px-4 py-3 text-gray-700 dark:text-gray-300"}
                 >
                   {col.render ? col.render(row) : (row as Record<string, unknown>)[col.key] as React.ReactNode}
                 </td>
