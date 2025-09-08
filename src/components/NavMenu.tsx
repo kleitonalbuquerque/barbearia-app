@@ -9,7 +9,7 @@ import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 const menuItems = [
     { label: "Agendamentos", href: "/agendamentos" },
-    { label: "Dashboard", href: "/" },
+    { label: "Sobre", href: "/sobre" },
     { label: "Clientes", href: "/clientes" },
     { label: "Barbeiros", href: "/barbeiros" },
     { label: "Serviços", href: "/servicos" },
@@ -52,7 +52,9 @@ export default function NavMenu() {
             </svg>
           </button>
           <div className="flex items-center gap-6">
-            <span className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">BarbeariaApp</span>
+            <Link href="/" className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight focus:outline-none" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+              BarbeariaApp <span className="text-xs font-normal text-gray-500 dark:text-gray-400 align-top ml-1">v0.1.0</span>
+            </Link>
             <div className="hidden lg:flex items-center gap-6">
               {menuItems.map((item) => (
                 <Link
@@ -89,7 +91,7 @@ export default function NavMenu() {
                 {adminDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50 animate-fade-in">
                     <Link href="/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Gerenciar Usuários</Link>
-                    <Link href="/admin/configuracoes" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Configurações</Link>
+                    <Link href="/financeiro" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Financeiro</Link>
                     <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => { setAdminDropdownOpen(false); logout(); router.push("/login"); }}>Sair</button>
                   </div>
                 )}
