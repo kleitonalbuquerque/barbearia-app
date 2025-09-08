@@ -25,8 +25,14 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   }
 }
 
-// Atualizar agendamento
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+// Atualizar agendamento (compatível com Next.js 14+/Netlify/Vercel)
+export async function PUT(request: NextRequest, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {
+  let params: { id: string };
+  if ('then' in context.params) {
+    params = await context.params;
+  } else {
+    params = context.params;
+  }
   try {
     const data = await request.json();
     const { payment, serviceTypeId, ...rest } = data;
@@ -36,7 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Atualiza dados do agendamento
-    const updated = await prisma.appointment.update({
+    await prisma.appointment.update({
       where: { id: params.id },
       data: rest,
       include: { items: true, payment: true }
