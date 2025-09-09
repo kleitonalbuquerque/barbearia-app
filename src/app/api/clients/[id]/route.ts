@@ -4,10 +4,10 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Buscar cliente por ID
-export async function GET(request: Request, context: { params: { id: string } }) {
-  const { params } = context;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const client = await prisma.client.findUnique({ where: { id: params.id } });
+    const { id } = await params;
+    const client = await prisma.client.findUnique({ where: { id } });
     if (!client) {
       return NextResponse.json({ success: false, error: 'Cliente não encontrado' }, { status: 404 });
     }
@@ -18,12 +18,12 @@ export async function GET(request: Request, context: { params: { id: string } })
 }
 
 // Atualizar cliente
-export async function PUT(request: Request, context: { params: { id: string } }) {
-  const { params } = context;
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const data = await request.json();
     const updatedClient = await prisma.client.update({
-      where: { id: params.id },
+      where: { id },
       data,
     });
     return NextResponse.json({ success: true, client: updatedClient });
@@ -33,10 +33,10 @@ export async function PUT(request: Request, context: { params: { id: string } })
 }
 
 // Deletar cliente
-export async function DELETE(request: Request, context: { params: { id: string } }) {
-  const { params } = context;
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.client.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.client.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });
