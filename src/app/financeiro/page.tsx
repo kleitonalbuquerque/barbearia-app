@@ -191,7 +191,21 @@ export default function FinanceiroPage() {
         {loading ? (
           <div className="flex items-center gap-2"><span className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-600"></span> Carregando...</div>
         ) : (
-          <Bar data={chartData} options={{ plugins: { legend: { display: false } } }} height={80} />
+          <div style={{ background: '#fff', borderRadius: 12, padding: 16, width: '100%' }}>
+            <Bar
+              data={chartData}
+              options={{
+                plugins: { legend: { display: false } },
+                layout: { padding: 0 },
+                backgroundColor: '#fff',
+                scales: {
+                  x: { grid: { color: '#e5e7eb' }, ticks: { color: '#222' } },
+                  y: { grid: { color: '#e5e7eb' }, ticks: { color: '#222' } },
+                },
+              }}
+              height={80}
+            />
+          </div>
         )}
       </div>
       <div className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
