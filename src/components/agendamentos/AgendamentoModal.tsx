@@ -126,7 +126,7 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
             <FontAwesomeIcon icon={faUser} className="absolute right-3 text-white pointer-events-none z-10" />
           </div>
           <label htmlFor="serviceTypeId">Tipo de Serviço</label>
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex items-center">
             <select
               id="serviceTypeId"
               name="serviceTypeId"
@@ -140,19 +140,19 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
               {serviceTypes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
             <FontAwesomeIcon icon={faScissors} className="absolute right-3 text-white pointer-events-none z-10" />
-            {/* Exibe valor do serviço selecionado */}
-            {form.serviceTypeId && (
-              <span className="text-white text-sm bg-gray-700 rounded px-2 py-1 ml-2">
-                {(() => {
-                  const servico = serviceTypes.find(s => s.id === form.serviceTypeId);
-                  const preco = servico && typeof servico.priceCents === 'number' ? servico.priceCents : undefined;
-                  return servico && preco !== undefined
-                    ? `R$ ${(preco / 100).toFixed(2)}`
-                    : null;
-                })()}
-              </span>
-            )}
           </div>
+          {/* Exibe valor do serviço selecionado */}
+          {form.serviceTypeId && (
+            <span className="block text-white text-sm bg-gray-700 rounded px-2 py-1 mt-2">
+              {(() => {
+                const servico = serviceTypes.find(s => s.id === form.serviceTypeId);
+                const preco = servico && typeof servico.priceCents === 'number' ? servico.priceCents : undefined;
+                return servico && preco !== undefined
+                  ? `R$ ${(preco / 100).toFixed(2)}`
+                  : null;
+              })()}
+            </span>
+          )}
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded" disabled={saving}>
             {saving ? "Agendando..." : "Agendar"}
