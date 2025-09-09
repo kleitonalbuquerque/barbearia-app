@@ -22,7 +22,6 @@ const menuItems = [
     { label: "Clientes", href: "/clientes" },
     { label: "Barbeiros", href: "/barbeiros" },
     { label: "Serviços", href: "/servicos" },
-    { label: "Formas de Pagamento", href: "/pagamentos" },
 ];
 
 export default function NavMenu() {
