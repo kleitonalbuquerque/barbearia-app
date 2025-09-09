@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 // Handler compatível com Next.js 14+/Netlify/Vercel
 export async function GET(request: NextRequest, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {

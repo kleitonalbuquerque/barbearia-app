@@ -1,8 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { requireSuperadmin } from '../../barbers/utils';
 
-const prisma = new PrismaClient();
 
 // Buscar tipo de serviço por ID
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {

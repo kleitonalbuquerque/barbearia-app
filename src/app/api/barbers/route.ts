@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { requireSuperadmin } from './utils';
 
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   const auth = await requireSuperadmin(request);

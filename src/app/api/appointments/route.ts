@@ -1,8 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { sendMail } from '../../../lib/mailer';
 
-const prisma = new PrismaClient();
 
 // Criar agendamento
 export async function POST(request: NextRequest) {
