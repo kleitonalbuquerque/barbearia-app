@@ -102,13 +102,24 @@ export default function NovoClientePage() {
           onChange={handleChange}
           required
         />
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition mt-2"
-          disabled={loading}
-        >
-          {loading ? "Salvando..." : "Cadastrar"}
-        </button>
+
+        <div className="flex flex-col gap-2 mt-2">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition"
+            disabled={loading}
+          >
+            {loading ? "Salvando..." : "Cadastrar"}
+          </button>
+          <button
+            type="button"
+            className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded shadow transition"
+            onClick={() => router.push("/clientes")}
+            disabled={loading}
+          >
+            Cancelar
+          </button>
+        </div>
         {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
         {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
       </form>

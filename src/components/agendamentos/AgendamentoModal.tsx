@@ -1,5 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faUserTie, faScissors } from '@fortawesome/free-solid-svg-icons';
+import './AgendamentoModal.css';
 
 interface ServiceType {
   id: string;
@@ -103,40 +106,45 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
         <h2 className="text-xl font-bold mb-4">Novo Agendamento</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label htmlFor="agendamento-date">Data</label>
-          <input id="agendamento-date" type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded" />
+          <input id="agendamento-date" type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full date-white" />
           <label htmlFor="agendamento-time">Horário</label>
-          <input id="agendamento-time" type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded" />
+          <input id="agendamento-time" type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full time-white" />
           <label htmlFor="agendamento-barber">Barbeiro</label>
-          <select id="agendamento-barber" name="barberId" value={form.barberId} onChange={handleChange} required className="p-2 border rounded">
-            <option value="">Selecione</option>
-            {barbers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
+          <div className="relative flex items-center">
+            <select id="agendamento-barber" name="barberId" value={form.barberId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
+              <option value="">Selecione</option>
+              {barbers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+            <FontAwesomeIcon icon={faUserTie} className="absolute right-3 text-white pointer-events-none z-10" />
+          </div>
           <label htmlFor="agendamento-client">Cliente</label>
-          <select id="agendamento-client" name="clientId" value={form.clientId} onChange={handleChange} required className="p-2 border rounded">
-            <option value="">Selecione</option>
-            {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          <div className="relative flex items-center">
+            <select id="agendamento-client" name="clientId" value={form.clientId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
+              <option value="">Selecione</option>
+              {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <FontAwesomeIcon icon={faUser} className="absolute right-3 text-white pointer-events-none z-10" />
+          </div>
           <label htmlFor="serviceTypeId">Tipo de Serviço</label>
-          <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-2">
             <select
               id="serviceTypeId"
               name="serviceTypeId"
               value={form.serviceTypeId}
               onChange={handleChange}
               required
-              className="p-2 border rounded flex-1"
+              className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10 flex-1"
+              style={{ minWidth: 0, backgroundImage: 'none' }}
             >
               <option value="">Selecione</option>
               {serviceTypes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            <FontAwesomeIcon icon={faScissors} className="absolute right-3 text-white pointer-events-none z-10" />
             {/* Exibe valor do serviço selecionado */}
             {form.serviceTypeId && (
-              <span className="text-gray-700 text-sm bg-gray-100 rounded px-2 py-1">
+              <span className="text-white text-sm bg-gray-700 rounded px-2 py-1 ml-2">
                 {(() => {
                   const servico = serviceTypes.find(s => s.id === form.serviceTypeId);
-                  // Se tiver priceCents, mostra, senão só nome
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore: pode não ter priceCents no tipo, mas backend retorna
                   const preco = servico && typeof servico.priceCents === 'number' ? servico.priceCents : undefined;
                   return servico && preco !== undefined
                     ? `R$ ${(preco / 100).toFixed(2)}`

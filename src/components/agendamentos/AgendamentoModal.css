@@ -1,0 +1,5 @@
+/* Força o ícone nativo dos inputs date/time a ficar branco (Webkit/Blink browsers) */
+input[type="date"].date-white::-webkit-calendar-picker-indicator,
+input[type="time"].time-white::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(2);
+}
