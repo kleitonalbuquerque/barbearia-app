@@ -16,6 +16,7 @@ interface Appointment {
 interface Barber { id: string; name: string; }
 interface Client { id: string; name: string; }
 interface ServiceType { id: string; name: string; priceCents: number; }
+
 export default function AgendamentosPage() {
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -59,6 +60,7 @@ export default function AgendamentosPage() {
       .finally(() => setLoading(false));
   }, [fetchAuthed, buildQuery, isAuthenticated]);
 
+
   // Sempre carrega agendamentos ao abrir a tela e ao mudar filtros, mas só após autenticação
   useEffect(() => {
     if (!authLoading) fetchAppointments();
@@ -66,6 +68,11 @@ export default function AgendamentosPage() {
 
   function handleCreated(appointment: Appointment) {
     setAppointments(a => [appointment, ...a]);
+  }
+
+  // Se não autenticado e não está carregando, mostra mensagem de login obrigatório
+  if (!authLoading && !isAuthenticated) {
+    return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
   }
 
   let content;

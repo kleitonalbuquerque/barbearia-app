@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface ServiceType {
   id: string;
@@ -13,7 +13,7 @@ interface ServiceType {
 }
 
 export default function ServicosPage() {
-  const { fetchAuthed } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [services, setServices] = useState<ServiceType[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,13 +22,18 @@ export default function ServicosPage() {
   const router = useRouter();
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/services?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
-      .then((res) => res.json())
-      .then((data) => setServices(data.services || []))
-      .finally(() => setLoading(false));
-  }, [search, orderBy, orderDir]);
+    if (!authLoading && isAuthenticated) {
+      setLoading(true);
+      fetch(`/api/services?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
+        .then((res) => res.json())
+        .then((data) => setServices(data.services || []))
+        .finally(() => setLoading(false));
+    }
+  }, [search, orderBy, orderDir, authLoading, isAuthenticated]);
 
+  if (!authLoading && !isAuthenticated) {
+    return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
+  }
   return (
     <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
       <div className="flex items-center justify-between mb-6">

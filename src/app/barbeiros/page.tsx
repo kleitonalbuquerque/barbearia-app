@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import BarbeirosTable from "@/components/BarbeirosTable";
 
@@ -12,6 +13,7 @@ interface Barber {
 }
 
 export default function BarbeirosPage() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [search, setSearch] = useState("");
   const [orderBy, setOrderBy] = useState("createdAt");
@@ -20,16 +22,21 @@ export default function BarbeirosPage() {
   const router = useRouter();
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/barbers?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
-      .then((res) => res.json())
-      .then((data) => setBarbers(data.barbers || []))
-      .finally(() => setLoading(false));
-  }, [search, orderBy, orderDir]);
+    if (!authLoading && isAuthenticated) {
+      setLoading(true);
+      fetch(`/api/barbers?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
+        .then((res) => res.json())
+        .then((data) => setBarbers(data.barbers || []))
+        .finally(() => setLoading(false));
+    }
+  }, [search, orderBy, orderDir, authLoading, isAuthenticated]);
 
   
   // Removed columns definition as BarbeirosTable handles it internally
 
+  if (!authLoading && !isAuthenticated) {
+    return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
+  }
   return (
     <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
       <div className="flex items-center justify-between mb-6">
