@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useServiceTypes, ServiceType } from "@/hooks/useServiceTypes";
+import { useBarbers, Barber } from "@/hooks/useBarbers";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from "@headlessui/react";
 import type { Appointment } from "./AgendamentosTable";
@@ -10,6 +11,7 @@ interface AppointmentSaveData {
   status: string;
   paymentMethod: string;
   serviceTypeId: string;
+  barberId: string;
 }
 interface AppointmentEditModalProps {
   readonly isOpen: boolean;
@@ -23,28 +25,45 @@ interface AppointmentEditModalProps {
 export default function AppointmentEditModal({ isOpen, onClose, appointment, onSave, canEditStatus, paymentMethods }: AppointmentEditModalProps) {
   const [date, setDate] = useState<Date | null>(null);
   const [status, setStatus] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [serviceTypeId, setServiceTypeId] = useState("");
   const [servicePrice, setServicePrice] = useState(0);
+  const [barberId, setBarberId] = useState("");
+  const { barbers } = useBarbers();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { serviceTypes } = useServiceTypes();
 
   useEffect(() => {
-    if (appointment) {
-      setDate(appointment.startAt ? new Date(appointment.startAt) : null);
-      setStatus(appointment.status || "");
-      setPaymentMethod(appointment.payment?.method || "");
-      setServiceTypeId(appointment.items?.[0]?.serviceTypeId || "");
-      if (appointment.items?.[0]?.priceCentsSnapshot) {
-        setServicePrice(appointment.items[0].priceCentsSnapshot / 100);
-      } else if (appointment.items?.[0]?.serviceTypeId && serviceTypes.length) {
-        const st = serviceTypes.find(s => s.id === appointment.items[0].serviceTypeId);
-        setServicePrice(st ? st.priceCents / 100 : 0);
-      }
+    if (!appointment) return;
+    setDate(appointment.startAt ? new Date(appointment.startAt) : null);
+    setStatus(appointment.status || "");
+    setPaymentMethod(appointment.payment?.method ?? "");
+    setServiceTypeId(appointment.items?.[0]?.serviceTypeId || "");
+    if (appointment.items?.[0]?.priceCentsSnapshot) {
+      setServicePrice(appointment.items[0].priceCentsSnapshot / 100);
+    } else if (appointment.items?.[0]?.serviceTypeId && serviceTypes.length) {
+      const st = serviceTypes.find(s => s.id === appointment.items[0].serviceTypeId);
+      setServicePrice(st ? st.priceCents / 100 : 0);
     }
   }, [appointment, isOpen, serviceTypes]);
+
+  // Sincroniza barberId após barbers carregar
+  useEffect(() => {
+    if (!appointment || !barbers.length) return;
+    // Debug: log valores atuais
+    console.log("[DEBUG] appointment.barber:", appointment.barber);
+    console.log("[DEBUG] barbers:", barbers);
+    if (appointment.barber?.id) {
+      setBarberId(appointment.barber.id);
+      console.log("[DEBUG] setBarberId pelo id:", appointment.barber.id);
+    } else if (appointment.barber?.name) {
+      const found = barbers.find(b => b.name === appointment.barber?.name);
+      setBarberId(found?.id || "");
+      console.log("[DEBUG] setBarberId pelo nome:", found?.id || "");
+    }
+  }, [appointment, barbers, isOpen]);
 
   useEffect(() => {
     if (status === "CANCELLED" && paymentMethod) {
@@ -63,6 +82,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
         status,
         paymentMethod,
         serviceTypeId,
+        barberId,
       });
       setSuccess("Agendamento atualizado com sucesso!");
       setTimeout(() => {
@@ -82,11 +102,27 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="fixed z-50 inset-0">
-      <DialogBackdrop className="fixed inset-0 bg-black bg-opacity-40" />
+  <DialogBackdrop className="fixed inset-0 bg-black/60" />
       <div className="fixed inset-0 flex items-center justify-center">
         <DialogPanel className="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md z-10">
           <DialogTitle className="text-lg font-bold mb-4">Editar Agendamento</DialogTitle>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
+            {/* Barbeiro editável */}
+            <div>
+              <label htmlFor="edit-barber" className="block text-sm font-semibold mb-1">Barbeiro</label>
+              <select
+                id="edit-barber"
+                className="p-2 border rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                value={barberId}
+                onChange={e => setBarberId(e.target.value)}
+                required
+              >
+                <option value="">Selecione</option>
+                {barbers.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
             {/* Nome do cliente (readonly) */}
             {appointment?.client?.name && (
               <div>
@@ -146,7 +182,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
                   className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={status === "CANCELED" ? "" : paymentMethod}
                   onChange={e => setPaymentMethod(e.target.value)}
-                  required={status !== "CANCELED"}
+                  required={status === "COMPLETED"}
                   disabled={status === "CANCELED"}
                 >
                 <option value="">Selecione</option>

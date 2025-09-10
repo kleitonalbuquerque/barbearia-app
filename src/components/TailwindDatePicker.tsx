@@ -2,6 +2,9 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "@/styles/datepicker-overrides.css";
+import { registerLocale } from "react-datepicker";
+import { ptBR } from "date-fns/locale/pt-BR";
+registerLocale("pt-BR", ptBR);
 
 interface TailwindDatePickerProps {
   value: Date | null;
@@ -19,7 +22,11 @@ export default function TailwindDatePicker({ value, onChange, placeholder, id }:
         onChange={onChange}
         className="p-2 border rounded w-full text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
         placeholderText={placeholder}
-        dateFormat="yyyy-MM-dd"
+        showTimeSelect
+        timeFormat="HH:mm"
+        timeIntervals={15}
+        dateFormat="dd/MM/yyyy HH:mm"
+        locale="pt-BR"
         calendarClassName="!bg-white dark:!bg-gray-900 !border-gray-300 dark:!border-gray-700"
         popperClassName="z-50"
       />

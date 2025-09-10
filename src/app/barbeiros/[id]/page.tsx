@@ -73,7 +73,13 @@ export default function BarbeiroDetalhePage() {
     ])
       .then(([barberData, appointmentsData]) => {
         setBarber(barberData.barber || null);
-        setAppointments(appointmentsData.appointments || []);
+        // Inclui o campo barber em cada appointment
+        const barberObj = barberData.barber ? { id: barberData.barber.id, name: barberData.barber.name } : undefined;
+        const appointmentsWithBarber = (appointmentsData.appointments || []).map((appt: any) => ({
+          ...appt,
+          barber: barberObj,
+        }));
+        setAppointments(appointmentsWithBarber);
         setForm({
           name: barberData.barber?.name || "",
           email: barberData.barber?.email || "",
@@ -364,10 +370,12 @@ export default function BarbeiroDetalhePage() {
                     create?: { method: string; amountCents: number };
                   };
                   serviceTypeId?: string;
+                  barberId?: string;
                 } = {
                   startAt: data.date ? data.date.toISOString() : editAppointment.startAt,
                   status: data.status,
                   serviceTypeId: data.serviceTypeId,
+                  barberId: data.barberId,
                 };
                 // Só envie payment se realmente for criar/alterar
                 if (
@@ -386,31 +394,38 @@ export default function BarbeiroDetalhePage() {
                 const result = await res.json();
                 if (!result.success) throw new Error(result.message || "Erro ao salvar agendamento.");
                 // Atualizar lista local
-                setAppointments((prev) => prev.map((a) => {
-                  if (a.id !== editAppointment.id) return a;
-                  let updatedPayment = a.payment;
-                  if (a.payment && data.paymentMethod) {
-                    updatedPayment = { ...a.payment, method: data.paymentMethod, id: a.payment.id };
+                setAppointments((prev) => {
+                  // Se o barberId mudou, remove da lista local
+                  if (data.barberId && data.barberId !== barberId) {
+                    return prev.filter((a) => a.id !== editAppointment.id);
                   }
-                  // Atualiza também o serviço e preço localmente
-                  let updatedItems = a.items;
-                  if (data.serviceTypeId) {
-                    const st = serviceTypes.find(s => s.id === data.serviceTypeId);
-                    updatedItems = [{
-                      ...a.items[0],
-                      serviceTypeId: data.serviceTypeId,
-                      priceCentsSnapshot: st ? st.priceCents : a.items[0].priceCentsSnapshot,
-                      serviceType: st ? { name: st.name } : a.items[0].serviceType,
-                    }];
-                  }
-                  return {
-                    ...a,
-                    startAt: data.date ? data.date.toISOString() : a.startAt,
-                    payment: updatedPayment,
-                    status: data.status || a.status,
-                    items: updatedItems,
-                  };
-                }));
+                  // Caso contrário, atualiza normalmente
+                  return prev.map((a) => {
+                    if (a.id !== editAppointment.id) return a;
+                    let updatedPayment = a.payment;
+                    if (a.payment && data.paymentMethod) {
+                      updatedPayment = { ...a.payment, method: data.paymentMethod, id: a.payment.id };
+                    }
+                    // Atualiza também o serviço e preço localmente
+                    let updatedItems = a.items;
+                    if (data.serviceTypeId) {
+                      const st = serviceTypes.find(s => s.id === data.serviceTypeId);
+                      updatedItems = [{
+                        ...a.items[0],
+                        serviceTypeId: data.serviceTypeId,
+                        priceCentsSnapshot: st ? st.priceCents : a.items[0].priceCentsSnapshot,
+                        serviceType: st ? { name: st.name } : a.items[0].serviceType,
+                      }];
+                    }
+                    return {
+                      ...a,
+                      startAt: data.date ? data.date.toISOString() : a.startAt,
+                      payment: updatedPayment,
+                      status: data.status || a.status,
+                      items: updatedItems,
+                    };
+                  });
+                });
                 setEditAppointment(null);
               }
             }}
