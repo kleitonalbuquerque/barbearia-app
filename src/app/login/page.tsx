@@ -15,7 +15,7 @@ export default function LoginPage() {
     setError("");
     const ok = await login(email, password);
     if (ok) {
-      router.push("/");
+      router.replace("/");
     } else {
       setError("Credenciais inválidas");
     }

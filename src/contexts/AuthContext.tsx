@@ -37,10 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       const data = await res.json();
       if (data.success && data.user) {
-        // Força reload para garantir que o AuthContext detecte o cookie httpOnly
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
+        setUser(data.user);
         return true;
       }
       return false;
