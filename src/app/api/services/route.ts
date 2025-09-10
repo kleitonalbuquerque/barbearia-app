@@ -6,8 +6,11 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    // Verifica se já existe serviço com mesmo nome
-    const existing = await prisma.serviceType.findFirst({ where: { name: data.name } });
+    // Verifica se já existe serviço com mesmo nome (ignora se nome não informado)
+    let existing = null;
+    if (data.name) {
+      existing = await prisma.serviceType.findFirst({ where: { name: data.name } });
+    }
     if (existing) {
       return NextResponse.json({ success: false, error: 'Já existe serviço com este nome.' }, { status: 400 });
     }

@@ -9,16 +9,15 @@ export async function POST(request: NextRequest) {
   if (auth) return auth;
   try {
     const data = await request.json();
-    // Verifica se já existe barbeiro com email, cpf ou cnpj
-    const existing = await prisma.barber.findFirst({
-      where: {
-        OR: [
-          { email: data.email },
-          { cpf: data.cpf },
-          { cnpj: data.cnpj || undefined }
-        ]
-      }
-    });
+    // Verifica duplicidade apenas se email, cpf ou cnpj forem informados
+    const orConditions = [];
+    if (data.email) orConditions.push({ email: data.email });
+    if (data.cpf) orConditions.push({ cpf: data.cpf });
+    if (data.cnpj) orConditions.push({ cnpj: data.cnpj });
+    let existing = null;
+    if (orConditions.length > 0) {
+      existing = await prisma.barber.findFirst({ where: { OR: orConditions } });
+    }
     if (existing) {
       return NextResponse.json({ success: false, error: 'Já existe barbeiro com este email, CPF ou CNPJ.' }, { status: 400 });
     }

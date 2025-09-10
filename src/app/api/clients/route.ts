@@ -6,15 +6,14 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    // Verifica se já existe cliente com email ou cpf
-    const existing = await prisma.client.findFirst({
-      where: {
-        OR: [
-          { email: data.email || undefined },
-          { cpf: data.cpf }
-        ]
-      }
-    });
+    // Verifica duplicidade apenas se email ou cpf forem informados
+    const orConditions = [];
+    if (data.email) orConditions.push({ email: data.email });
+    if (data.cpf) orConditions.push({ cpf: data.cpf });
+    let existing = null;
+    if (orConditions.length > 0) {
+      existing = await prisma.client.findFirst({ where: { OR: orConditions } });
+    }
     if (existing) {
       return NextResponse.json({ success: false, error: 'Já existe cliente com este email ou CPF.' }, { status: 400 });
     }
