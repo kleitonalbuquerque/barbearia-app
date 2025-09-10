@@ -27,7 +27,7 @@ interface Appointment {
   status: string;
   items: AppointmentItem[];
   payment?: Payment;
-  barber?: { name: string };
+  barber?: { id: string; name: string };
 }
 
 interface Payment {
