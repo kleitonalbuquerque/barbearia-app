@@ -31,15 +31,15 @@ export default function NovoClientePage() {
   }
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validateEmail(form.email)) {
+    if (form.email && !validateEmail(form.email)) {
       setError("E-mail inválido");
       return;
     }
-    if (!validateCPF(form.cpf)) {
+    if (form.cpf && !validateCPF(form.cpf)) {
       setError("CPF deve ter 11 dígitos numéricos");
       return;
     }
-    if (!validatePhone(form.phone)) {
+    if (form.phone && !validatePhone(form.phone)) {
       setError("Telefone inválido. Ex: (11) 99999-9999");
       return;
     }
@@ -92,7 +92,6 @@ export default function NovoClientePage() {
           placeholder="Telefone"
           value={form.phone}
           onChange={handleChange}
-          required
         />
         <input
           className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
@@ -100,7 +99,6 @@ export default function NovoClientePage() {
           placeholder="CPF"
           value={form.cpf}
           onChange={handleChange}
-          required
         />
 
         <div className="flex flex-col gap-2 mt-2">

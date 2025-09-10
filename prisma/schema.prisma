@@ -32,8 +32,8 @@ datasource db {
 model Barber {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
-  phone     String
+  email     String?  @unique
+  phone     String?
   cpf       String?  @unique
   cnpj      String?  @unique
   status    Status   @default(ACTIVE)
@@ -54,8 +54,8 @@ model Client {
   id        String   @id @default(uuid())
   name      String
   email     String?  @unique
-  phone     String
-  cpf       String   @unique
+  phone     String?
+  cpf       String?  @unique
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   appointments Appointment[]
