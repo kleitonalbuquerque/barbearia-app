@@ -24,10 +24,10 @@ export async function POST(request: NextRequest) {
     const barber = await prisma.barber.create({
       data: {
         name: data.name,
-        email: data.email,
-        phone: data.phone,
-        cpf: data.cpf,
-        cnpj: data.cnpj || null,
+        email: data.email ? data.email : null,
+        phone: data.phone ? data.phone : null,
+        cpf: data.cpf ? data.cpf : null,
+        cnpj: data.cnpj ? data.cnpj : null,
         status: 'ACTIVE',
       },
     });

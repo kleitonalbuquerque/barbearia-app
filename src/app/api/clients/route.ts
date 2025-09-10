@@ -20,9 +20,9 @@ export async function POST(request: Request) {
     const client = await prisma.client.create({
       data: {
         name: data.name,
-        email: data.email || null,
-        phone: data.phone,
-        cpf: data.cpf,
+        email: data.email ? data.email : null,
+        phone: data.phone ? data.phone : null,
+        cpf: data.cpf ? data.cpf : null,
       },
     });
     return NextResponse.json({ success: true, message: 'Cliente criado com sucesso!', client });
