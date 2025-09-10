@@ -22,7 +22,10 @@ export function middleware(request: NextRequest) {
   }
 
   // Checa cookie de sessão (ajuste conforme sua estratégia de auth)
-  const token = request.cookies.get('next-auth.session-token')?.value || request.cookies.get('session')?.value;
+  const token =
+    request.cookies.get('auth_token')?.value ||
+    request.cookies.get('next-auth.session-token')?.value ||
+    request.cookies.get('session')?.value;
   if (!token) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
