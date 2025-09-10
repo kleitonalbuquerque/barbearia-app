@@ -75,7 +75,7 @@ export default function BarbeiroDetalhePage() {
         setBarber(barberData.barber || null);
         // Inclui o campo barber em cada appointment
         const barberObj = barberData.barber ? { id: barberData.barber.id, name: barberData.barber.name } : undefined;
-        const appointmentsWithBarber = (appointmentsData.appointments || []).map((appt: any) => ({
+        const appointmentsWithBarber = (appointmentsData.appointments || []).map((appt: Appointment) => ({
           ...appt,
           barber: barberObj,
         }));
