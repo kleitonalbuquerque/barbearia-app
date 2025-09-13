@@ -27,6 +27,10 @@ export default function AgendamentosPage() {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
+  // Paginação
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
 
   // Carregar barbers, clients, services para selects
   useEffect(() => {
@@ -41,9 +45,11 @@ export default function AgendamentosPage() {
     if (filters.search) params.push(`q=${encodeURIComponent(filters.search)}`);
     if (filters.date) params.push(`startAt=${filters.date}`);
     if (filters.status) params.push(`status=${filters.status}`);
-    params.push("includeBarber=true", "includeClient=true", "pageSize=50");
+    params.push("includeBarber=true", "includeClient=true");
+    params.push(`page=${page}`);
+    params.push(`pageSize=${pageSize}`);
     return params.length ? "?" + params.join("&") : "";
-  }, [filters]);
+  }, [filters, page, pageSize]);
 
   // Buscar agendamentos com filtros
   const fetchAppointments = React.useCallback(() => {
@@ -53,8 +59,10 @@ export default function AgendamentosPage() {
     fetchFn(`/api/appointments${buildQuery()}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success) setAppointments(data.appointments);
-        else setError(data.message || "Erro ao carregar agendamentos");
+        if (data.success) {
+          setAppointments(data.appointments);
+          setTotal(data.total || 0);
+        } else setError(data.message || "Erro ao carregar agendamentos");
       })
       .catch(() => setError("Erro ao carregar agendamentos"))
       .finally(() => setLoading(false));
@@ -65,6 +73,11 @@ export default function AgendamentosPage() {
   useEffect(() => {
     if (!authLoading) fetchAppointments();
   }, [authLoading, fetchAppointments]);
+
+  // Resetar para página 1 ao mudar filtros
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
 
   function handleCreated(appointment: Appointment) {
     setAppointments(a => [appointment, ...a]);
@@ -165,6 +178,46 @@ export default function AgendamentosPage() {
         </button>
       </div>
       {content}
+      {/* Paginação */}
+      <div className="flex items-center justify-between mt-4">
+        <div>
+          Página {page} de {Math.max(1, Math.ceil(total / pageSize))}
+        </div>
+        <div className="flex gap-2 items-center">
+          <button
+            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+            onClick={() => setPage(1)}
+            disabled={page === 1}
+          >Início</button>
+          <button
+            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >Anterior</button>
+          <button
+            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+            onClick={() => setPage(p => p + 1)}
+            disabled={page >= Math.ceil(total / pageSize)}
+          >Próxima</button>
+          <button
+            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+            onClick={() => setPage(Math.max(1, Math.ceil(total / pageSize)))}
+            disabled={page >= Math.ceil(total / pageSize)}
+          >Última</button>
+          <select
+            className="ml-2 p-1 border rounded bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+            value={pageSize}
+            onChange={e => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
+          >
+            {[5, 10, 20, 50].map(size => (
+              <option key={size} value={size} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{size} por página</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <AgendamentoModal
         open={showModal}
         onClose={() => setShowModal(false)}

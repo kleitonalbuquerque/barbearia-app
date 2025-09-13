@@ -19,17 +19,26 @@ export default function BarbeirosPage() {
   const [orderBy, setOrderBy] = useState("createdAt");
   const [orderDir, setOrderDir] = useState<"asc"|"desc">("desc");
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       setLoading(true);
-      fetch(`/api/barbers?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}`)
+      fetch(`/api/barbers?q=${encodeURIComponent(search)}&orderBy=${orderBy}&orderDir=${orderDir}&page=${page}&pageSize=${pageSize}`)
         .then((res) => res.json())
-        .then((data) => setBarbers(data.barbers || []))
+        .then((data) => {
+          setBarbers(data.barbers || []);
+          setTotal(data.total || 0);
+        })
         .finally(() => setLoading(false));
     }
-  }, [search, orderBy, orderDir, authLoading, isAuthenticated]);
+  }, [search, orderBy, orderDir, page, pageSize, authLoading, isAuthenticated]);
+
+  // Resetar para página 1 ao mudar filtros
+  useEffect(() => { setPage(1); }, [search, orderBy, orderDir]);
 
   
   // Removed columns definition as BarbeirosTable handles it internally
@@ -50,13 +59,13 @@ export default function BarbeirosPage() {
       </div>
       <div className="flex flex-col md:flex-row gap-2 mb-6">
         <input
-          className="w-full p-3 text-base border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-gray-900"
+          className="w-full px-3 py-2 text-base border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-gray-900"
           placeholder="Buscar por nome, e-mail, telefone ou CPF..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
-          className="p-3 border border-gray-300 rounded text-gray-900 bg-gray-50"
+          className="px-3 py-2 text-base border border-gray-300 rounded text-gray-900 bg-gray-50"
           value={orderBy}
           onChange={e => setOrderBy(e.target.value)}
         >
@@ -65,18 +74,70 @@ export default function BarbeirosPage() {
           <option value="email">Email</option>
         </select>
         <select
-          className="p-3 border border-gray-300 rounded text-gray-900 bg-gray-50"
+          className="px-3 py-2 text-base border border-gray-300 rounded text-gray-900 bg-gray-50"
           value={orderDir}
           onChange={e => setOrderDir(e.target.value as "asc"|"desc")}
         >
           <option value="desc">Desc</option>
           <option value="asc">Asc</option>
         </select>
+        <button
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded shadow transition min-w-[120px] whitespace-nowrap text-base flex-shrink-0"
+          onClick={() => {
+            setSearch("");
+            setOrderBy("createdAt");
+            setOrderDir("desc");
+          }}
+        >
+          Limpar filtros
+        </button>
       </div>
       {loading ? (
         <p className="text-gray-700">Carregando...</p>
       ) : (
-        <BarbeirosTable barbers={barbers} />
+        <>
+          <BarbeirosTable barbers={barbers} />
+          {/* Paginação */}
+          <div className="flex items-center justify-between mt-4">
+            <div>
+              Página {page} de {Math.max(1, Math.ceil(total / pageSize))}
+            </div>
+            <div className="flex gap-2 items-center">
+              <button
+                className="px-3 py-2 text-base rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+              >Início</button>
+              <button
+                className="px-3 py-2 text-base rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >Anterior</button>
+              <button
+                className="px-3 py-2 text-base rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(p => p + 1)}
+                disabled={page >= Math.ceil(total / pageSize)}
+              >Próxima</button>
+              <button
+                className="px-3 py-2 text-base rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(Math.max(1, Math.ceil(total / pageSize)))}
+                disabled={page >= Math.ceil(total / pageSize)}
+              >Última</button>
+              <select
+                className="ml-2 px-3 py-2 text-base border rounded bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                value={pageSize}
+                onChange={e => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                {[5, 10, 20, 50].map(size => (
+                  <option key={size} value={size} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{size} por página</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

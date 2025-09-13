@@ -49,6 +49,10 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get('q');
     const orderBy = searchParams.get('orderBy') || 'createdAt';
     const orderDir = (searchParams.get('orderDir') as 'asc' | 'desc') || 'desc';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
     const where = q
       ? {
           OR: [
@@ -59,11 +63,14 @@ export async function GET(request: NextRequest) {
           ],
         }
       : undefined;
+    const total = await prisma.barber.count({ where });
     const barbers = await prisma.barber.findMany({
       where,
       orderBy: { [orderBy]: orderDir },
+      skip,
+      take,
     });
-    return NextResponse.json({ success: true, barbers });
+    return NextResponse.json({ success: true, barbers, total, page, pageSize });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
