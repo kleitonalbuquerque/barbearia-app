@@ -1,6 +1,7 @@
 
 "use client";
 import React, { useEffect, useState } from "react";
+import AgendamentosTable from "@/components/AgendamentosTable";
 import { useAuth } from "@/contexts/AuthContext";
 import AgendamentoModal from "@/components/agendamentos/AgendamentoModal";
 
@@ -94,50 +95,21 @@ export default function AgendamentosPage() {
   } else if (error) {
     content = <div className="p-8 text-center text-red-600">{error}</div>;
   } else {
+    // Adaptar os dados para o formato esperado por AgendamentosTable
+    const appointmentsAdapted = appointments.map(a => ({
+      ...a,
+      professional: a.professional || undefined,
+      client: a.client || undefined,
+      items: a.items.map((i, idx) => ({
+        id: i.serviceType?.id || String(idx),
+        serviceTypeId: i.serviceType?.id || String(idx),
+        priceCentsSnapshot: i.serviceType?.priceCents || 0,
+        durationMinutesSnapshot: 0,
+        serviceType: i.serviceType ? { name: i.serviceType.name } : undefined,
+      })),
+    }));
     content = (
-      <div className="overflow-x-auto w-full brand-bg rounded shadow p-2">
-        <table className="min-w-full brand-table">
-          <thead>
-            <tr>
-              <th className="p-3 text-left">Data</th>
-              <th className="p-3 text-left">Hora</th>
-              <th className="p-3 text-left">Profissional</th>
-              <th className="p-3 text-left">Cliente</th>
-              <th className="p-3 text-left">Serviço</th>
-              <th className="p-3 text-left">Preço</th>
-              <th className="p-3 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="p-8 text-center text-gray-400">Nenhum agendamento encontrado.</td>
-              </tr>
-            ) : appointments.map((a) => {
-              const data = new Date(a.startAt);
-              const dataStr = data.toLocaleDateString("pt-BR");
-              const horaStr = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-              const servico = a.items.map(i => i.serviceType?.name || "-").join(", ");
-              const preco = a.items.reduce((acc, i) => acc + (i.serviceType?.priceCents || 0), 0) / 100;
-              let statusLabel = a.status;
-              if (a.status === "SCHEDULED") statusLabel = "Agendado";
-              else if (a.status === "COMPLETED") statusLabel = "Concluído";
-              else if (a.status === "CANCELED") statusLabel = "Cancelado";
-              return (
-                <tr key={a.id} className="border-t border-gray-700">
-                  <td className="p-3">{dataStr}</td>
-                  <td className="p-3">{horaStr}</td>
-                  <td className="p-3">{a.professional?.name || "-"}</td>
-                  <td className="p-3">{a.client?.name || "-"}</td>
-                  <td className="p-3">{servico}</td>
-                  <td className="p-3">R$ {preco.toFixed(2)}</td>
-                  <td className="p-3">{statusLabel}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <AgendamentosTable appointments={appointmentsAdapted} />
     );
   }
 

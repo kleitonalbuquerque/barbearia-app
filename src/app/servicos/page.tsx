@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
+import ServicesTable from "@/components/ServicesTable";
 import { useRouter } from "next/navigation";
 
 interface ServiceType {
@@ -93,41 +92,7 @@ export default function ServicosPage() {
         <p className="text-gray-300">Carregando...</p>
       ) : (
         <>
-          <div className="brand-bg rounded shadow p-2">
-            <table className="min-w-full brand-table">
-              <thead>
-                <tr>
-                  <th className="px-4 py-3 text-left">Nome</th>
-                  <th className="px-4 py-3 text-left">Preço</th>
-                  <th className="px-4 py-3 text-left">Duração (min)</th>
-                  <th className="px-4 py-3 text-center">Detalhes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.length === 0 ? (
-                  <tr><td colSpan={4} className="text-center py-6 text-gray-400">Nenhum serviço encontrado.</td></tr>
-                ) : (
-                  services.map(service => (
-                    <tr key={service.id} className="hover:bg-blue-50 dark:hover:bg-gray-800 transition">
-                      <td className="px-4 py-3">{service.name}</td>
-                      <td className="px-4 py-3">R$ {(service.priceCents/100).toFixed(2)}</td>
-                      <td className="px-4 py-3">{service.durationMinutes}</td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
-                          style={{ background: 'none', border: 'none', padding: 0 }}
-                          onClick={() => router.push(`/servicos/${service.id}`)}
-                          aria-label="Ver detalhes"
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          <ServicesTable services={services} />
           {/* Paginação */}
           <div className="flex items-center justify-between mt-4">
             <div className="text-white">

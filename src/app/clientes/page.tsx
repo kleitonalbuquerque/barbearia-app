@@ -95,9 +95,7 @@ export default function ClientesPage() {
         <p className="text-gray-300">Carregando...</p>
       ) : (
         <>
-          <div className="brand-bg rounded shadow p-2">
             <ClientesTable clients={clients} />
-          </div>
           {/* Paginação */}
           <div className="flex items-center justify-between mt-4">
             <div className="text-white">

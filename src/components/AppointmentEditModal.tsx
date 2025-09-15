@@ -100,6 +100,13 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
     }
   }
 
+  if (!appointment || !professionals.length) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <span style={{ color: '#000', fontWeight: 500, fontSize: 18 }}>Carregando...</span>
+      </div>
+    );
+  }
   return (
     <Dialog open={isOpen} onClose={onClose} className="fixed z-50 inset-0">
   <DialogBackdrop className="fixed inset-0 bg-black/60" />

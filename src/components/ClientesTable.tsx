@@ -23,25 +23,25 @@ const ClientesTable: React.FC<ClientesTableProps> = ({ clients }) => {
       key: "name",
       header: "Nome",
       render: (client) => client.name,
-      className: "brand-table text-left",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "email",
       header: "Email",
       render: (client) => client.email,
-      className: "brand-table text-left",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "phone",
       header: "Telefone",
       render: (client) => client.phone,
-      className: "brand-table text-left",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "cpf",
       header: "CPF",
       render: (client) => client.cpf,
-      className: "brand-table text-left",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200",
     },
     {
       key: "detalhes",
@@ -59,7 +59,7 @@ const ClientesTable: React.FC<ClientesTableProps> = ({ clients }) => {
           </button>
         </div>
       ),
-      className: "brand-table text-center",
+      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-800 dark:text-gray-200",
     },
   ];
 
@@ -69,7 +69,7 @@ const ClientesTable: React.FC<ClientesTableProps> = ({ clients }) => {
       data={clients}
       emptyMessage="Nenhum cliente encontrado."
       rowKey={(row) => row.id}
-      tableClassName="min-w-full brand-bg brand-table"
+      tableClassName="min-w-full bg-white dark:bg-gray-900"
     />
   );
 };

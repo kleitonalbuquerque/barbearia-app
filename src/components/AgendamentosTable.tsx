@@ -174,13 +174,22 @@ function getColumns(context: "client" | "professional" = "professional", onEditC
   return columns;
 }
 
-const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageProfessional = "Nenhum serviço agendado para este profissional.", context = "professional", onRowClick }) => (
-  <DataTable
-    columns={getColumns(context, onRowClick)}
-    data={appointments}
-    emptyMessage={context === "client" ? emptyServiceMessageClient : emptyServiceMessageProfessional}
-    rowKey={(row) => row.id}
-    onRowClick={onRowClick}
-  />
-);
+const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageProfessional = "Nenhum serviço agendado para este profissional.", context = "professional", onRowClick }) => {
+  // Forçar as tds a herdarem o fundo da tr e hover
+  const columns = getColumns(context, onRowClick).map(col => ({
+    ...col,
+    className: (col.className || "") + " bg-inherit group-hover:bg-gray-100 group-hover:dark:bg-gray-800 transition-colors",
+  }));
+  return (
+    <DataTable
+      columns={columns}
+      data={appointments}
+      emptyMessage={context === "client" ? emptyServiceMessageClient : emptyServiceMessageProfessional}
+      rowKey={(row) => row.id}
+      onRowClick={onRowClick}
+      tableClassName="min-w-full bg-white dark:bg-gray-900"
+      rowClassName="group hover:bg-gray-100 hover:dark:bg-gray-800 transition-colors"
+    />
+  );
+};
 export default AgendamentosTable;
