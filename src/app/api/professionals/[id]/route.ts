@@ -1,3 +1,6 @@
+import { NextResponse, NextRequest } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
 // PUT /api/professionals/[id] - Editar profissional
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
 	try {
@@ -19,8 +22,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 		return NextResponse.json({ success: false, error: message }, { status: 400 });
 	}
 }
-import { NextResponse, NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 // GET /api/professionals/[id] - Detalhes de um profissional
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
