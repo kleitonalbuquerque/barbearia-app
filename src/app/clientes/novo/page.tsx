@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
 
 export default function NovoClientePage() {
   const { fetchAuthed } = useAuth();
+  const { tenantId } = useTenant();
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
@@ -47,10 +49,15 @@ export default function NovoClientePage() {
     setError("");
     setSuccess("");
     try {
+      if (!tenantId) {
+        setError("TenantId não encontrado. Faça login novamente ou selecione um negócio.");
+        setLoading(false);
+        return;
+      }
       const res = await fetchAuthed("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, tenantId }),
       });
       const data = await res.json();
       setLoading(false);

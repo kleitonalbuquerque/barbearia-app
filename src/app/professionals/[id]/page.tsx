@@ -216,7 +216,7 @@ export default function ProfessionalDetalhePage() {
         </div>
         <section className="mb-8">
           {editMode ? (
-            <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-md">
+            <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-md rounded shadow p-6 border border-gray-200">
               <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
               <input
                 id="name"

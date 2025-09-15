@@ -197,41 +197,45 @@ export default function ClienteDetalhePage() {
         </div>
         <section className="mb-8">
           {editMode ? (
-            <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-md">
-              <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
+            <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-md rounded shadow p-6">
+              <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
               <input
                 id="name"
-                className="p-3 border-2 border-blue-500 focus:ring-2 focus:ring-blue-400 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 font-bold"
+                className="p-3 border-2 border-blue-500 focus:ring-2 focus:ring-blue-400 rounded text-gray-900 bg-white placeholder-gray-500 font-bold"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
                 required
                 autoFocus
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Email</label>
+              <label htmlFor="email" className="text-sm font-semibold brand-title">Email</label>
               <input
                 id="email"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 type="email"
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="phone" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Telefone</label>
+              <label htmlFor="phone" className="text-sm font-semibold brand-title">Telefone</label>
               <input
                 id="phone"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="cpf" className="text-sm font-semibold text-gray-700 dark:text-gray-200">CPF</label>
+              <label htmlFor="cpf" className="text-sm font-semibold brand-title">CPF</label>
               <input
                 id="cpf"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="cpf"
                 value={form.cpf}
                 onChange={handleChange}
+                style={{ background: '#fff' }}
               />
               <hr className="my-4 border-gray-300 dark:border-gray-700" />
               {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
@@ -248,7 +252,7 @@ export default function ClienteDetalhePage() {
         </section>
         <section className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Serviços realizados/cancelados</h2>
+            <h2 className="text-lg font-semibold brand-title">Serviços realizados/cancelados</h2>
             <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
               Serviços concluídos: {appointments.filter(a => a.status === 'COMPLETED' || a.status === 'CONCLUÍDO').length}
             </span>

@@ -86,7 +86,7 @@ export default function EditarServicoPage() {
     <div className="max-w-lg mx-auto p-4">
   <h1 className="text-2xl font-bold mb-6 brand-title">Editar Serviço</h1>
       <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4">
-        <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
+  <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
         <input
           id="name"
           className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
@@ -96,7 +96,7 @@ export default function EditarServicoPage() {
           disabled={!editMode}
           required
         />
-        <label htmlFor="priceCents" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Preço (R$)</label>
+  <label htmlFor="priceCents" className="text-sm font-semibold brand-title">Preço (R$)</label>
         <input
           id="priceCents"
           className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
@@ -109,7 +109,7 @@ export default function EditarServicoPage() {
           min="0"
           step="0.01"
         />
-        <label htmlFor="durationMinutes" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Duração (minutos)</label>
+  <label htmlFor="durationMinutes" className="text-sm font-semibold brand-title">Duração (minutos)</label>
         <input
           id="durationMinutes"
           className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"

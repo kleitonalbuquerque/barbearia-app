@@ -107,7 +107,7 @@ export default function UsuariosPage() {
       {showForm && isAuthenticated && !authLoading && (
         <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4 mb-6">
           {/* ...existing code... */}
-          <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
+          <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
           <input
             id="name"
             name="name"
@@ -116,7 +116,7 @@ export default function UsuariosPage() {
             required
             className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
-          <label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-200">E-mail</label>
+          <label htmlFor="email" className="text-sm font-semibold brand-title">E-mail</label>
           <input
             id="email"
             name="email"
@@ -126,7 +126,7 @@ export default function UsuariosPage() {
             required
             className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mt-4">Telefone</label>
+          <label htmlFor="phone" className="block text-sm font-medium brand-title mt-4">Telefone</label>
           <input
             id="phone"
             name="phone"
@@ -137,7 +137,7 @@ export default function UsuariosPage() {
             placeholder="(11) 99999-9999"
             className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
-          <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mt-4">CPF (opcional)</label>
+          <label htmlFor="cpf" className="block text-sm font-medium brand-title mt-4">CPF (opcional)</label>
           <input
             id="cpf"
             name="cpf"
@@ -147,7 +147,7 @@ export default function UsuariosPage() {
             placeholder="Somente números, 11 dígitos"
             className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
-          <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mt-4">CNPJ (opcional)</label>
+          <label htmlFor="cnpj" className="block text-sm font-medium brand-title mt-4">CNPJ (opcional)</label>
           <input
             id="cnpj"
             name="cnpj"
@@ -157,7 +157,7 @@ export default function UsuariosPage() {
             placeholder="Somente números, 14 dígitos"
             className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
           />
-          <label htmlFor="password" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Senha</label>
+          <label htmlFor="password" className="text-sm font-semibold brand-title">Senha</label>
           <input
             id="password"
             name="password"
