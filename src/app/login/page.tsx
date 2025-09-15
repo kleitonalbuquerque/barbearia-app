@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+// ...existing code...
 import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
 
@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  // ...existing code...
   const { setTenantId } = useTenant();
 
   async function handleSubmit(e: React.FormEvent) {

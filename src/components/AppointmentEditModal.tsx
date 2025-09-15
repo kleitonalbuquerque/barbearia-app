@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useServiceTypes, ServiceType } from "@/hooks/useServiceTypes";
+import { useServiceTypes } from "@/hooks/useServiceTypes";
 import { useProfessionals } from "@/hooks/useProfessionals";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from "@headlessui/react";
