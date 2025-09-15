@@ -68,7 +68,7 @@ export default function NovoClientePage() {
 
   return (
   <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 text-white">Novo Cliente</h1>
+  <h1 className="text-2xl font-bold mb-6 brand-title">Novo Cliente</h1>
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4">
         <input
           className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"

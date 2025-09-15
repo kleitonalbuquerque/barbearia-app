@@ -1,4 +1,11 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+# Agenda360
+
+Sistema multi-tenant de agendamento online para diversos nichos (barbearia, clínica, consultório, veterinária, etc).
+
+---
+
+Este é um projeto [Next.js](https://nextjs.org) bootstrapped com [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
@@ -44,27 +51,27 @@ Se autenticado, retorna os dados do usuário. Use o email do superadmin como tok
 
 ---
 
-## API - CRUD Barbeiro (Acesso restrito ao superadmin)
+## API - CRUD Profissional (Acesso restrito ao superadmin)
 
-### Criar barbeiro
+### Criar profissional
 ```bash
 curl -X POST http://localhost:3000/api/barbers \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer novo_admin@email.com" \
-  -d '{"name":"João Barbeiro","email":"joao@barbearia.com","phone":"11999999999","cpf":"12345678901"}'
+  -d '{"name":"João Profissional","email":"joao@barbearia.com","phone":"11999999999","cpf":"12345678901"}'
 ```
 
-### Listar barbeiros
+### Listar profissionais
 ```bash
 curl http://localhost:3000/api/barbers
 ```
 
-### Buscar barbeiro por ID
+### Buscar profissional por ID
 ```bash
 curl http://localhost:3000/api/barbers/{id}
 ```
 
-### Atualizar barbeiro
+### Atualizar profissional
 ```bash
 curl -X PUT http://localhost:3000/api/barbers/{id} \
   -H "Content-Type: application/json" \
@@ -72,7 +79,7 @@ curl -X PUT http://localhost:3000/api/barbers/{id} \
   -d '{"name":"João Atualizado"}'
 ```
 
-### Deletar barbeiro
+### Deletar profissional
 ```bash
 curl -X DELETE http://localhost:3000/api/barbers/{id} \
   -H "Authorization: Bearer superadmin@email.com"
@@ -194,7 +201,7 @@ curl -X POST http://localhost:3000/api/appointments \
 
 - [ ] Adicionar paginação e filtros na listagem de agendamentos
 - [ ] Adicionar filtros e paginação nos clientes
-- [ ] Adicionar filtros e paginação nos barbeiros
+- [ ] Adicionar filtros e paginação nos profissionais
 - [ ] Retornar horários disponíveis para agendamento
 - [ ] Adicionar notificações (e-mail/push)
 - [ ] Implementar logs de auditoria detalhados
@@ -279,7 +286,7 @@ O endpoint GET `/api/appointments` suporta os seguintes filtros e parâmetros de
 
 | Parâmetro         | Tipo     | Descrição                                                                                 | Exemplo de uso                                                                 |
 |-------------------|----------|-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| `barberId`        | string   | Filtra por ID do barbeiro                                                               | `?barberId=13b9bcb6-...`                                                      |
+| `professionalId`        | string   | Filtra por ID do profissional                                                               | `?professionalId=13b9bcb6-...`                                                      |
 | `clientId`        | string   | Filtra por ID do cliente                                                                | `?clientId=97c4ed2a-...`                                                      |
 | `status`          | string   | Filtra por status único ou múltiplos separados por vírgula                              | `?status=SCHEDULED` ou `?status=SCHEDULED,COMPLETED`                          |
 | `serviceTypeId`   | string   | Filtra por tipo de serviço (serviceTypeId)                                              | `?serviceTypeId=9b75c49f-...`                                                 |
@@ -290,11 +297,11 @@ O endpoint GET `/api/appointments` suporta os seguintes filtros e parâmetros de
 | `orderBy`         | string   | Campo para ordenação (ex: startAt, status, clientId, barberId)                          | `?orderBy=startAt`                                                            |
 | `order`           | string   | Direção da ordenação: `asc` (crescente) ou `desc` (decrescente, padrão)                 | `?order=asc`                                                                  |
 | `clientName`      | string   | Busca textual (contém, sem case sensitive) no nome do cliente                        | `?clientName=joao`                                                             |
-| `barberName`      | string   | Busca textual (contém, sem case sensitive) no nome do barbeiro                       | `?barberName=pedro`                                                            |
+| `professionalName`      | string   | Busca textual (contém, sem case sensitive) no nome do profissional                       | `?professionalName=pedro`                                                            |
 
 #### Exemplos de uso
 
-- Listar agendamentos do barbeiro por múltiplos status, ordenando do mais antigo para o mais recente:
+- Listar agendamentos do profissional por múltiplos status, ordenando do mais antigo para o mais recente:
   ```bash
   curl "http://localhost:3000/api/appointments?barberId=13b9bcb6-14b0-4e6b-82f2-fd353917781d&status=SCHEDULED,COMPLETED&orderBy=startAt&order=asc&page=1&pageSize=10"
   ```
@@ -314,7 +321,7 @@ O endpoint GET `/api/appointments` suporta os seguintes filtros e parâmetros de
   ```bash
   curl "http://localhost:3000/api/appointments?clientName=Kleiton&page=1&pageSize=10"
   ```
-- Buscar agendamentos de barbeiros cujo nome contém "Lucas":
+- Buscar agendamentos de profissionais cujo nome contém "Lucas":
   ```bash
   curl "http://localhost:3000/api/appointments?barberName=Lucas&page=1&pageSize=10"
   ```

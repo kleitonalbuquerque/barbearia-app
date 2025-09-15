@@ -4,7 +4,7 @@ import React from "react";
 interface AgendamentoFiltersValues {
   date: string;
   client: string;
-  barber: string;
+  professional: string;
   service: string;
   status: string;
 }
@@ -26,8 +26,8 @@ export default function AgendamentoFilters({ filters, onChange }: AgendamentoFil
         <input type="text" placeholder="Nome do cliente" value={filters.client} onChange={e => onChange({ ...filters, client: e.target.value })} className="p-2 border rounded" />
       </div>
       <div>
-        <label className="block text-xs font-semibold mb-1">Barbeiro</label>
-        <input type="text" placeholder="Nome do barbeiro" value={filters.barber} onChange={e => onChange({ ...filters, barber: e.target.value })} className="p-2 border rounded" />
+  <label className="block text-xs font-semibold mb-1">Profissional</label>
+  <input type="text" placeholder="Nome do profissional" value={filters.professional} onChange={e => onChange({ ...filters, professional: e.target.value })} className="p-2 border rounded" />
       </div>
       <div>
         <label className="block text-xs font-semibold mb-1">Serviço</label>

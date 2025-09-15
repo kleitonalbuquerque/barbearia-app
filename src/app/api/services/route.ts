@@ -20,6 +20,7 @@ export async function POST(request: Request) {
         priceCents: data.priceCents,
         durationMinutes: data.durationMinutes,
         paymentAllowed: { set: ["CASH"] },
+        tenant: { connect: { id: data.tenantId } },
       },
     });
     return NextResponse.json({ success: true, message: 'Serviço criado com sucesso!', service });

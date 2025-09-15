@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useServiceTypes, ServiceType } from "@/hooks/useServiceTypes";
-import { useBarbers, Barber } from "@/hooks/useBarbers";
+import { useProfessionals } from "@/hooks/useProfessionals";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from "@headlessui/react";
 import type { Appointment } from "./AgendamentosTable";
@@ -11,7 +11,7 @@ interface AppointmentSaveData {
   status: string;
   paymentMethod: string;
   serviceTypeId: string;
-  barberId: string;
+  professionalId: string;
 }
 interface AppointmentEditModalProps {
   readonly isOpen: boolean;
@@ -28,8 +28,8 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [serviceTypeId, setServiceTypeId] = useState("");
   const [servicePrice, setServicePrice] = useState(0);
-  const [barberId, setBarberId] = useState("");
-  const { barbers } = useBarbers();
+  const [professionalId, setProfessionalId] = useState("");
+  const { professionals } = useProfessionals();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -49,21 +49,21 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
     }
   }, [appointment, isOpen, serviceTypes]);
 
-  // Sincroniza barberId após barbers carregar
+  // Sincroniza professionalId após professionals carregar
   useEffect(() => {
-    if (!appointment || !barbers.length) return;
+    if (!appointment || !professionals.length) return;
     // Debug: log valores atuais
-    console.log("[DEBUG] appointment.barber:", appointment.barber);
-    console.log("[DEBUG] barbers:", barbers);
-    if (appointment.barber?.id) {
-      setBarberId(appointment.barber.id);
-      console.log("[DEBUG] setBarberId pelo id:", appointment.barber.id);
-    } else if (appointment.barber?.name) {
-      const found = barbers.find(b => b.name === appointment.barber?.name);
-      setBarberId(found?.id || "");
-      console.log("[DEBUG] setBarberId pelo nome:", found?.id || "");
+    console.log("[DEBUG] appointment.professional:", appointment.professional);
+    console.log("[DEBUG] professionals:", professionals);
+    if (appointment.professional?.id) {
+      setProfessionalId(appointment.professional.id);
+      console.log("[DEBUG] setProfessionalId pelo id:", appointment.professional.id);
+    } else if (appointment.professional?.name) {
+      const found = professionals.find(p => p.name === appointment.professional?.name);
+      setProfessionalId(found?.id || "");
+      console.log("[DEBUG] setProfessionalId pelo nome:", found?.id || "");
     }
-  }, [appointment, barbers, isOpen]);
+  }, [appointment, professionals, isOpen]);
 
   useEffect(() => {
     if (status === "CANCELLED" && paymentMethod) {
@@ -82,7 +82,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
         status,
         paymentMethod,
         serviceTypeId,
-        barberId,
+        professionalId,
       });
       setSuccess("Agendamento atualizado com sucesso!");
       setTimeout(() => {
@@ -107,19 +107,19 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
         <DialogPanel className="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md z-10">
           <DialogTitle className="text-lg font-bold mb-4">Editar Agendamento</DialogTitle>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
-            {/* Barbeiro editável */}
+            {/* Profissional editável */}
             <div>
-              <label htmlFor="edit-barber" className="block text-sm font-semibold mb-1">Barbeiro</label>
+              <label htmlFor="edit-professional" className="block text-sm font-semibold mb-1">Profissional</label>
               <select
-                id="edit-barber"
+                id="edit-professional"
                 className="p-2 border rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                value={barberId}
-                onChange={e => setBarberId(e.target.value)}
+                value={professionalId}
+                onChange={e => setProfessionalId(e.target.value)}
                 required
               >
                 <option value="">Selecione</option>
-                {barbers.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
+                {professionals.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
             </div>

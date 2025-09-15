@@ -95,7 +95,7 @@ export default function UsuariosPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 text-white">Gerenciar Usuários Admin</h1>
+  <h1 className="text-2xl font-bold mb-6 brand-title">Gerenciar Usuários Admin</h1>
       <div className="mb-4 flex justify-end">
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow"

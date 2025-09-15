@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function test() {
   const q = 'teste';
-  const barbers = await prisma.barber.findMany({
+  const professionals = await prisma.professional.findMany({
     where: {
       OR: [
         { name: { contains: q, mode: 'insensitive' } },
@@ -15,7 +15,7 @@ async function test() {
       ],
     },
   });
-  console.log(barbers);
+  console.log(professionals);
 }
 
 test();

@@ -1,0 +1,6 @@
+Remover manualmente as seguintes pastas e arquivos para evitar conflitos no Windows:
+
+- src/app/barbeiros/
+- src/app/api/barbers/
+
+Certifique-se de que todo o código foi migrado antes de excluir.

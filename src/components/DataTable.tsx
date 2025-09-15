@@ -21,12 +21,15 @@ function DataTable<T>({
   data,
   emptyMessage = "Nenhum registro encontrado.",
   rowKey,
-  tableClassName = "min-w-full bg-white dark:bg-gray-900",
+  tableClassName = "min-w-full",
   onRowClick,
 }: DataTableProps<T>) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded shadow p-6 text-center text-gray-700 dark:text-gray-300">
+      <div
+        className="rounded shadow p-6 text-center"
+        style={{ background: "var(--secondary)", color: "var(--text)" }}
+      >
         {emptyMessage}
       </div>
     );
@@ -34,15 +37,19 @@ function DataTable<T>({
 
   return (
     <div className="overflow-x-auto rounded shadow max-w-full sm:max-w-none">
-      <table className={tableClassName + " min-w-[600px] sm:min-w-full"}>
+      <table
+        className={tableClassName + " min-w-[600px] sm:min-w-full"}
+        style={{ background: "var(--secondary)" }}
+      >
         <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
+                style={{ color: "var(--accent)", background: "var(--secondary)" }}
                 className={
                   col.className ||
-                  "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap"
+                  "px-4 py-3 text-left font-semibold whitespace-nowrap"
                 }
               >
                 {col.header}
@@ -54,13 +61,14 @@ function DataTable<T>({
           {data.map((row, idx) => (
             <tr
               key={rowKey ? rowKey(row) : idx}
-              className="group border-b border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-gray-800"
-              // Clique de navegação deve ser controlado explicitamente via botão/ícone na coluna de detalhes
+              style={{ color: "var(--text)" }}
+              className="group border-b hover:bg-blue-50"
             >
               {columns.map((col) => (
                 <td
                   key={col.key}
-                  className={col.className ? col.className.replace(/bg-[^\s]+/g, "") : "px-4 py-3 text-gray-700 dark:text-gray-300"}
+                  className={col.className ? col.className.replace(/bg-[^\s]+/g, "") : "px-4 py-3"}
+                  style={{ color: "var(--text)" }}
                 >
                   {col.render ? col.render(row) : (row as Record<string, unknown>)[col.key] as React.ReactNode}
                 </td>

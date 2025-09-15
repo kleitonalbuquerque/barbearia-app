@@ -9,7 +9,7 @@ interface ServiceType {
   name: string;
   priceCents: number;
 }
-interface Barber {
+interface Professional {
   id: string;
   name: string;
 }
@@ -23,7 +23,7 @@ interface Appointment {
   startAt: string;
   endAt: string;
   status: string;
-  barber: Barber | null;
+  professional: Professional | null;
   client: Client | null;
   items: { serviceType: ServiceType }[];
 }
@@ -33,15 +33,15 @@ interface AgendamentoModalProps {
   onClose: () => void;
   onCreated: (appointment: Appointment) => void;
   serviceTypes: ServiceType[];
-  barbers: Barber[];
+  professionals: Professional[];
   clients: Client[];
 }
 
-export default function AgendamentoModal({ open, onClose, onCreated, serviceTypes, barbers, clients }: Readonly<AgendamentoModalProps>) {
+export default function AgendamentoModal({ open, onClose, onCreated, serviceTypes, professionals, clients }: Readonly<AgendamentoModalProps>) {
   const [form, setForm] = useState({
     date: "",
     time: "",
-    barberId: "",
+    professionalId: "",
     clientId: "",
     serviceTypeId: ""
   });
@@ -68,7 +68,7 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          barberId: form.barberId,
+          professionalId: form.professionalId,
           clientId: form.clientId,
           startAt: startAt.toISOString(),
           endAt: endAt.toISOString(),
@@ -109,11 +109,11 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
           <input id="agendamento-date" type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full date-white" />
           <label htmlFor="agendamento-time">Horário</label>
           <input id="agendamento-time" type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full time-white" />
-          <label htmlFor="agendamento-barber">Barbeiro</label>
+          <label htmlFor="agendamento-professional">Profissional</label>
           <div className="relative flex items-center">
-            <select id="agendamento-barber" name="barberId" value={form.barberId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
+            <select id="agendamento-professional" name="professionalId" value={form.professionalId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
               <option value="">Selecione</option>
-              {barbers.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              {professionals.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
             <FontAwesomeIcon icon={faUserTie} className="absolute right-3 text-white pointer-events-none z-10" />
           </div>

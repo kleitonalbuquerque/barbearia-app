@@ -1,26 +1,88 @@
+/* Branding utility classes */
+.brand-title {
+  color: var(--accent);
+}
+
+.brand-bg {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.brand-table {
+  background: var(--secondary);
+  color: var(--text);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+}
+.brand-table th {
+  color: var(--accent);
+  background: var(--secondary);
+  font-weight: 600;
+}
+.brand-table td {
+  color: var(--text);
+}
 @import "tailwindcss";
 
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #ffffff;
+  --secondary: #171717;
+  --accent: #f472b6;
+  --text: #000000;
+  --background: var(--primary);
+  --foreground: var(--secondary);
 }
+
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --primary: #0a0a0a;
+    --secondary: #ededed;
+    --background: var(--primary);
+    --foreground: var(--secondary);
   }
 }
 
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--primary);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main.flex-1 {
+  flex: 1 1 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+/* Exemplo de uso das variáveis em botões, links, etc. */
+.btn-primary {
+  background: var(--primary);
+  color: var(--text);
+}
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--text);
+}
+.accent {
+  color: var(--accent);
 }

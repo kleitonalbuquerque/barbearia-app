@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireSuperadmin } from '../../barbers/utils';
+import { requireSuperadmin } from '../../../../utils/requireSuperadmin';
 
 
 // Buscar tipo de serviço por ID

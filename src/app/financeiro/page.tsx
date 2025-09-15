@@ -3,16 +3,18 @@ import { useEffect, useState, useRef } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
+
 interface Appointment {
   id: string;
   startAt: string;
   endAt: string;
   status: string;
-  barber: { id: string; name: string } | null;
+  professional: { id: string; name: string } | null;
   items: { priceCentsSnapshot: number }[];
 }
 
-interface Barber {
+
+interface Professional {
   id: string;
   name: string;
 }
@@ -20,32 +22,32 @@ interface Barber {
 
 
 export default function FinanceiroPage() {
-  const [showBarberDropdown, setShowBarberDropdown] = useState(false);
-  const barberDropdownRef = useRef<HTMLDivElement>(null);
+  const [showProfessionalDropdown, setShowProfessionalDropdown] = useState(false);
+  const professionalDropdownRef = useRef<HTMLDivElement>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [barbers, setBarbers] = useState<Barber[]>([]);
-  const [selectedBarbers, setSelectedBarbers] = useState<string[]>([]); // array de ids
+  const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [selectedProfessionals, setSelectedProfessionals] = useState<string[]>([]); // array de ids
 
-  // Carrega barbeiros para o filtro
+  // Carrega profissionais para o filtro
   useEffect(() => {
-    fetch("/api/barbers")
+    fetch("/api/professionals")
       .then(res => res.json())
       .then(data => {
-        if (data.success) setBarbers(data.barbers);
+        if (data.success) setProfessionals(data.professionals);
       });
   }, []);
 
   // Busca dados apenas ao clicar no botão
   const handleGenerate = () => {
-    let url = "/api/appointments?status=COMPLETED&includeBarber=true&pageSize=100";
+    let url = "/api/appointments?status=COMPLETED&includeProfessional=true&pageSize=100";
     if (startDate) url += `&startAt=${startDate}`;
     if (endDate) url += `&endAt=${endDate}`;
-    if (selectedBarbers.length > 0 && !selectedBarbers.includes("ALL")) {
-      url += selectedBarbers.map(id => `&barberId=${id}`).join("");
+    if (selectedProfessionals.length > 0 && !selectedProfessionals.includes("ALL")) {
+      url += selectedProfessionals.map(id => `&professionalId=${id}`).join("");
     }
     setLoading(true);
     fetch(url)
@@ -58,26 +60,26 @@ export default function FinanceiroPage() {
       .finally(() => setLoading(false));
   };
 
-  // Agrupa receita por barbeiro
-  const receitaPorBarbeiro: Record<string, { nome: string; total: number }> = {};
+  // Agrupa receita por profissional
+  const receitaPorProfissional: Record<string, { nome: string; total: number }> = {};
   let totalGeral = 0;
   appointments.forEach(a => {
     const valor = a.items.reduce((acc, i) => acc + (i.priceCentsSnapshot || 0), 0) / 100;
     totalGeral += valor;
-    if (a.barber) {
-      if (!receitaPorBarbeiro[a.barber.id]) receitaPorBarbeiro[a.barber.id] = { nome: a.barber.name, total: 0 };
-      receitaPorBarbeiro[a.barber.id].total += valor;
+    if (a.professional) {
+      if (!receitaPorProfissional[a.professional.id]) receitaPorProfissional[a.professional.id] = { nome: a.professional.name, total: 0 };
+      receitaPorProfissional[a.professional.id].total += valor;
     }
   });
 
   // Dados para o gráfico
   const chartData = {
-    labels: Object.values(receitaPorBarbeiro).map(b => b.nome),
+    labels: Object.values(receitaPorProfissional).map(b => b.nome),
     datasets: [
       {
         label: "Receita por Profissional (R$)",
-        data: Object.values(receitaPorBarbeiro).map(b => b.total),
-        backgroundColor: Object.values(receitaPorBarbeiro).map((_, idx) => {
+        data: Object.values(receitaPorProfissional).map(b => b.total),
+        backgroundColor: Object.values(receitaPorProfissional).map((_, idx) => {
           const palette = [
             "#22c55e", // verde
             "#2563eb", // azul
@@ -95,10 +97,10 @@ export default function FinanceiroPage() {
   };
 
   function exportToCSV() {
-    const header = "Data,Barbeiro,Valor (R$)\n";
+    const header = "Data,Profissional,Valor (R$)\n";
     const rows = appointments.map(a => {
       const data = new Date(a.startAt).toLocaleDateString("pt-BR");
-      const nome = a.barber?.name || "-";
+      const nome = a.professional?.name || "-";
       const valor = (a.items.reduce((acc, i) => acc + (i.priceCentsSnapshot || 0), 0) / 100).toFixed(2);
       return `${data},${nome},${valor}`;
     });
@@ -114,7 +116,7 @@ export default function FinanceiroPage() {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 md:px-8 py-8">
-      <h1 className="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400">Financeiro</h1>
+  <h1 className="text-2xl font-bold mb-6 brand-title">Financeiro</h1>
   <div className="flex flex-wrap gap-4 mb-6 items-end">
         <div>
           <label className="block text-sm font-semibold mb-1" htmlFor="start-date">Data início</label>
@@ -125,54 +127,54 @@ export default function FinanceiroPage() {
           <input id="end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="p-2 border rounded w-full bg-white text-gray-900" />
         </div>
         <div>
-          <label className="block text-sm font-semibold mb-1" htmlFor="barber-select">Profissional</label>
-          <div className="relative" ref={barberDropdownRef}>
+          <label className="block text-sm font-semibold mb-1" htmlFor="professional-select">Profissional</label>
+          <div className="relative" ref={professionalDropdownRef}>
             <button
               type="button"
-              id="barber-select"
+              id="professional-select"
               className="p-2 border rounded w-full min-w-[180px] h-[42px] text-left bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              onClick={() => setShowBarberDropdown(v => !v)}
+              onClick={() => setShowProfessionalDropdown(v => !v)}
             >
-              {selectedBarbers.length === 0 || selectedBarbers.includes("ALL")
+              {selectedProfessionals.length === 0 || selectedProfessionals.includes("ALL")
                 ? "Todos"
-                : barbers.filter(b => selectedBarbers.includes(b.id)).map(b => b.name).join(", ")}
+                : professionals.filter(b => selectedProfessionals.includes(b.id)).map(b => b.name).join(", ")}
               <span className="float-right">▼</span>
             </button>
-            {showBarberDropdown && (
+            {showProfessionalDropdown && (
               <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
                 <div
-                  className={`px-3 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 rounded flex items-center gap-2 ${selectedBarbers.includes("ALL") ? "font-bold text-blue-700 dark:text-blue-400" : ""}`}
+                  className={`px-3 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 rounded flex items-center gap-2 ${selectedProfessionals.includes("ALL") ? "font-bold text-blue-700 dark:text-blue-400" : ""}`}
                   onClick={() => {
-                    if (selectedBarbers.includes("ALL") || selectedBarbers.length === barbers.length) {
-                      setSelectedBarbers([]); // Limpa todos
+                    if (selectedProfessionals.includes("ALL") || selectedProfessionals.length === professionals.length) {
+                      setSelectedProfessionals([]); // Limpa todos
                     } else {
-                      setSelectedBarbers(["ALL", ...barbers.map(b => b.id)]); // Seleciona todos
+                      setSelectedProfessionals(["ALL", ...professionals.map(b => b.id)]); // Seleciona todos
                     }
                   }}
                 >
-                  <input type="checkbox" checked={selectedBarbers.includes("ALL") || selectedBarbers.length === barbers.length} readOnly />
+                  <input type="checkbox" checked={selectedProfessionals.includes("ALL") || selectedProfessionals.length === professionals.length} readOnly />
                   Todos
                 </div>
-                {barbers.map(b => (
+                {professionals.map(b => (
                   <div
                     key={b.id}
-                    className={`px-3 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 rounded flex items-center gap-2 ${selectedBarbers.includes(b.id) ? "font-bold text-blue-700 dark:text-blue-400" : ""}`}
+                    className={`px-3 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 rounded flex items-center gap-2 ${selectedProfessionals.includes(b.id) ? "font-bold text-blue-700 dark:text-blue-400" : ""}`}
                     onClick={() => {
-                      let newSelected = selectedBarbers.includes("ALL") ? [] : [...selectedBarbers];
+                      let newSelected = selectedProfessionals.includes("ALL") ? [] : [...selectedProfessionals];
                       if (newSelected.includes(b.id)) {
                         newSelected = newSelected.filter(id => id !== b.id);
                       } else {
                         newSelected.push(b.id);
                       }
                       // Se todos selecionados, marca ALL
-                      if (newSelected.length === barbers.length) {
-                        setSelectedBarbers(["ALL", ...barbers.map(b => b.id)]);
+                      if (newSelected.length === professionals.length) {
+                        setSelectedProfessionals(["ALL", ...professionals.map(b => b.id)]);
                       } else {
-                        setSelectedBarbers(newSelected);
+                        setSelectedProfessionals(newSelected);
                       }
                     }}
                   >
-                    <input type="checkbox" checked={selectedBarbers.includes(b.id) || selectedBarbers.includes("ALL") } readOnly />
+                    <input type="checkbox" checked={selectedProfessionals.includes(b.id) || selectedProfessionals.includes("ALL") } readOnly />
                     {b.name}
                   </div>
                 ))}
@@ -216,7 +218,7 @@ export default function FinanceiroPage() {
           <thead>
             <tr>
               <th className="p-3 text-left">Data</th>
-              <th className="p-3 text-left">Barbeiro</th>
+              <th className="p-3 text-left">Profissional</th>
               <th className="p-3 text-left">Valor (R$)</th>
             </tr>
           </thead>
@@ -227,7 +229,7 @@ export default function FinanceiroPage() {
               </tr>
             ) : appointments.map((a) => {
               const data = new Date(a.startAt).toLocaleDateString("pt-BR");
-              const nome = a.barber?.name || "-";
+              const nome = a.professional?.name || "-";
               const valor = (a.items.reduce((acc, i) => acc + (i.priceCentsSnapshot || 0), 0) / 100).toFixed(2);
               return (
                 <tr key={a.id} className="border-t border-gray-200 dark:border-gray-700">

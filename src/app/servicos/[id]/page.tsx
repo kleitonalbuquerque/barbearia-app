@@ -95,7 +95,7 @@ export default function ServicoDetalhePage() {
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 text-white">Detalhes do Serviço</h1>
+  <h1 className="text-2xl font-bold mb-6 brand-title">Detalhes do Serviço</h1>
       <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4">
         <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
         <input

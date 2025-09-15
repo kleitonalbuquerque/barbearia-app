@@ -11,16 +11,17 @@ interface TailwindDatePickerProps {
   onChange: (date: Date | null) => void;
   placeholder?: string;
   id?: string;
+  inputClassName?: string;
 }
 
-export default function TailwindDatePicker({ value, onChange, placeholder, id }: TailwindDatePickerProps) {
+export default function TailwindDatePicker({ value, onChange, placeholder, id, inputClassName }: TailwindDatePickerProps) {
   return (
     <div className="relative">
       <DatePicker
         id={id}
         selected={value}
         onChange={onChange}
-        className="p-2 border rounded w-full text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className={inputClassName || "p-2 border rounded w-full text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"}
         placeholderText={placeholder}
         showTimeSelect
         timeFormat="HH:mm"

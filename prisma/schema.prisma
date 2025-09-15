@@ -1,5 +1,20 @@
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  subdomain   String   @unique
+  businessType String  // nicho: barbearia, clínica, consultório, etc
+  branding    Json?    // cores, logo, etc (opcional)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  users       User[]
+  professionals Professional[]
+  clients     Client[]
+  services    ServiceType[]
+  appointments Appointment[]
+  @@map("tenant")
+}
 // Prisma schema for barbearia-app
-// Models: User, Barber, Client, ServiceType, Appointment, AppointmentItem, Payment, AuditLog
+// Models: User, Professional, Client, ServiceType, Appointment, AppointmentItem, Payment, AuditLog
 
 model User {
   id        String   @id @default(uuid())
@@ -10,6 +25,8 @@ model User {
   phone     String
   cpf       String?  @unique
   cnpj      String?  @unique
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @map("tenant_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   @@map("user")
@@ -29,7 +46,7 @@ datasource db {
   url       = env("DATABASE_URL")
 }
 
-model Barber {
+model Professional {
   id        String   @id @default(uuid())
   name      String
   email     String?  @unique
@@ -37,11 +54,13 @@ model Barber {
   cpf       String?  @unique
   cnpj      String?  @unique
   status    Status   @default(ACTIVE)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @map("tenant_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  appointments Appointment[] @relation("BarberAppointments")
-  auditLogs  AuditLog[] @relation("BarberAuditLogs")
-  @@map("barber")
+  appointments Appointment[] @relation("ProfessionalAppointments")
+  auditLogs  AuditLog[] @relation("ProfessionalAuditLogs")
+  @@map("professional")
 }
 
 enum Status {
@@ -56,6 +75,8 @@ model Client {
   email     String?  @unique
   phone     String?
   cpf       String?  @unique
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId  String   @map("tenant_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   appointments Appointment[]
@@ -69,6 +90,8 @@ model ServiceType {
   priceCents      Float @map("price_cents")
   paymentAllowed  PaymentAllowed[] @map("payment_allowed")
   countsAsHaircut Boolean  @default(false) @map("counts_as_haircut")
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId        String   @map("tenant_id")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
   appointmentItems AppointmentItem[]
@@ -85,10 +108,12 @@ enum PaymentAllowed {
 
 model Appointment {
   id         String   @id @default(uuid())
-  barber     Barber     @relation("BarberAppointments", fields: [barberId], references: [id])
-  barberId   String @map("barber_id")
-  client     Client   @relation(fields: [clientId], references: [id])
-  clientId   String @map("client_id")
+  professional     Professional?     @relation("ProfessionalAppointments", fields: [professionalId], references: [id])
+  professionalId   String? @map("professional_id")
+  client     Client?   @relation(fields: [clientId], references: [id])
+  clientId   String? @map("client_id")
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId   String   @map("tenant_id")
   items      AppointmentItem[]
   startAt    DateTime @map("start_at")
   endAt      DateTime @map("end_at")
@@ -129,8 +154,8 @@ model Payment {
 
 model AuditLog {
   id          String   @id @default(uuid())
-  actorBarber   Barber?    @relation("BarberAuditLogs", fields: [actorBarberId], references: [id])
-  actorBarberId String? @map("actor_barber_id")
+  actorProfessional   Professional?    @relation("ProfessionalAuditLogs", fields: [actorProfessionalId], references: [id])
+  actorProfessionalId String? @map("actor_professional_id")
   action      String
   entity      String
   entityId    String @map("entity_id")

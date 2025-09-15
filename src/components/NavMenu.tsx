@@ -20,7 +20,7 @@ const menuItems = [
     ), href: "/agendamentos" },
     { label: "Sobre", href: "/sobre" },
     { label: "Clientes", href: "/clientes" },
-    { label: "Barbeiros", href: "/barbeiros" },
+  { label: "Profissionais", href: "/professionals" },
     { label: "Serviços", href: "/servicos" },
 ];
 
@@ -29,7 +29,6 @@ export default function NavMenu() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
-  // Estado para dropdown Admin (desktop)
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const adminDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +44,22 @@ export default function NavMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [adminDropdownOpen]);
 
+  // Se estiver na tela de novo tenant, mostra só o logo
+  if (pathname === "/tenants/novo") {
+    return (
+      <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center">
+            <Link href="/" className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight focus:outline-none" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+              Agenda360 <span className="text-xs font-normal text-gray-500 dark:text-gray-400 align-top ml-1">v0.1.0</span>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // ...restante do menu padrão...
   return (
     <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,7 +76,7 @@ export default function NavMenu() {
           </button>
           <div className="flex items-center gap-6">
             <Link href="/" className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight focus:outline-none" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-              BarbeariaApp <span className="text-xs font-normal text-gray-500 dark:text-gray-400 align-top ml-1">v0.1.0</span>
+              Agenda360 <span className="text-xs font-normal text-gray-500 dark:text-gray-400 align-top ml-1">v0.1.0</span>
             </Link>
             <div className="hidden lg:flex items-center gap-6">
               {menuItems.map((item) => (
@@ -127,7 +142,7 @@ export default function NavMenu() {
         aria-label="Menu lateral"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
-          <span className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">BarbeariaApp</span>
+          <span className="text-xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">Agenda360</span>
           <button
             className="p-2 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             onClick={() => setDrawerOpen(false)}

@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireSuperadmin } from '../barbers/utils';
+import { requireSuperadmin } from '../../../utils/requireSuperadmin';
 
 
 // Criar tipo de serviço
@@ -16,6 +16,9 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json({ success: false, error: 'Já existe tipo de serviço com este nome.' }, { status: 400 });
     }
+    if (!data.tenantId) {
+      return NextResponse.json({ success: false, error: 'tenantId é obrigatório.' }, { status: 400 });
+    }
     const serviceType = await prisma.serviceType.create({
       data: {
         name: data.name,
@@ -23,6 +26,7 @@ export async function POST(request: NextRequest) {
         priceCents: data.priceCents,
         paymentAllowed: data.paymentAllowed,
         countsAsHaircut: data.countsAsHaircut ?? false,
+        tenant: { connect: { id: data.tenantId } },
       },
     });
     return NextResponse.json({ success: true, message: 'Tipo de serviço criado com sucesso!', serviceType });

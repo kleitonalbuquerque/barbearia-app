@@ -46,7 +46,7 @@ export default function ServicosPage() {
   return (
     <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Serviços</h1>
+        <h1 className="text-2xl font-bold brand-title">Serviços</h1>
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition"
           onClick={() => router.push("/servicos/novo")}
@@ -90,46 +90,48 @@ export default function ServicosPage() {
         </button>
       </div>
       {loading ? (
-        <p className="text-gray-700">Carregando...</p>
+        <p className="text-gray-300">Carregando...</p>
       ) : (
         <>
-          <table className="min-w-full bg-white dark:bg-gray-900 rounded shadow">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">Nome</th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">Preço</th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold">Duração (min)</th>
-                <th className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-800 dark:text-gray-200 font-semibold">Detalhes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-6 text-gray-500">Nenhum serviço encontrado.</td></tr>
-              ) : (
-                services.map(service => (
-                  <tr key={service.id} className="hover:bg-blue-50 dark:hover:bg-gray-800 transition">
-                    <td className="px-4 py-3">{service.name}</td>
-                    <td className="px-4 py-3">R$ {(service.priceCents/100).toFixed(2)}</td>
-                    <td className="px-4 py-3">{service.durationMinutes}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
-                        style={{ background: 'none', border: 'none', padding: 0 }}
-                        onClick={() => router.push(`/servicos/${service.id}`)}
-                        aria-label="Ver detalhes"
-                      >
-                        <FontAwesomeIcon icon={faEye} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <div className="brand-bg rounded shadow p-2">
+            <table className="min-w-full brand-table">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left">Nome</th>
+                  <th className="px-4 py-3 text-left">Preço</th>
+                  <th className="px-4 py-3 text-left">Duração (min)</th>
+                  <th className="px-4 py-3 text-center">Detalhes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {services.length === 0 ? (
+                  <tr><td colSpan={4} className="text-center py-6 text-gray-400">Nenhum serviço encontrado.</td></tr>
+                ) : (
+                  services.map(service => (
+                    <tr key={service.id} className="hover:bg-blue-50 dark:hover:bg-gray-800 transition">
+                      <td className="px-4 py-3">{service.name}</td>
+                      <td className="px-4 py-3">R$ {(service.priceCents/100).toFixed(2)}</td>
+                      <td className="px-4 py-3">{service.durationMinutes}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
+                          style={{ background: 'none', border: 'none', padding: 0 }}
+                          onClick={() => router.push(`/servicos/${service.id}`)}
+                          aria-label="Ver detalhes"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
           {/* Paginação */}
           <div className="flex items-center justify-between mt-4">
-            <div>
-              Página {page} de {Math.max(1, Math.ceil(total / pageSize))}
+            <div className="text-white">
+              <span style={{ color: '#000' }}>Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
             </div>
             <div className="flex gap-2 items-center">
               <button

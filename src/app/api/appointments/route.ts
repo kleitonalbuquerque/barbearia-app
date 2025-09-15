@@ -7,10 +7,10 @@ import { sendMail } from '../../../lib/mailer';
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    // Validação de existência de barberId, clientId
-    const barber = await prisma.barber.findUnique({ where: { id: data.barberId } });
-    if (!barber) {
-      return NextResponse.json({ success: false, message: 'Barbeiro não encontrado.' }, { status: 400 });
+    // Validação de existência de professionalId, clientId
+    const professional = await prisma.professional.findUnique({ where: { id: data.professionalId } });
+    if (!professional) {
+      return NextResponse.json({ success: false, message: 'Profissional não encontrado.' }, { status: 400 });
     }
     const client = await prisma.client.findUnique({ where: { id: data.clientId } });
     if (!client) {
@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: `Tipo de serviço não encontrado: ${item.serviceTypeId}` }, { status: 400 });
       }
     }
-    // Verifica conflito de horário para o barbeiro
+    // Verifica conflito de horário para o profissional
     const conflict = await prisma.appointment.findFirst({
       where: {
-        barberId: data.barberId,
+        professionalId: data.professionalId,
         status: { in: ['SCHEDULED', 'COMPLETED'] },
         OR: [
           {
@@ -37,13 +37,14 @@ export async function POST(request: NextRequest) {
       }
     });
     if (conflict) {
-      return NextResponse.json({ success: false, message: 'Conflito de horário para o barbeiro.' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Conflito de horário para o profissional.' }, { status: 400 });
     }
     // Cria o agendamento
     const appointment = await prisma.appointment.create({
       data: {
-        barberId: data.barberId,
+        professionalId: data.professionalId,
         clientId: data.clientId,
+        tenantId: data.tenantId, // obrigatório para multi-tenancy
         startAt: data.startAt,
         endAt: data.endAt,
         status: data.status || 'SCHEDULED',
@@ -57,14 +58,14 @@ export async function POST(request: NextRequest) {
       },
       include: {
         items: { include: { serviceType: true } },
-        barber: true,
+        professional: true,
         client: { select: { id: true, name: true } }
       }
     });
 
-    // Busca dados do barbeiro, cliente e serviço para o e-mail
-    const [barberFull, clientFull, serviceType] = await Promise.all([
-      prisma.barber.findUnique({ where: { id: data.barberId } }),
+    // Busca dados do profissional, cliente e serviço para o e-mail
+    const [professionalFull, clientFull, serviceType] = await Promise.all([
+      prisma.professional.findUnique({ where: { id: data.professionalId } }),
       prisma.client.findUnique({ where: { id: data.clientId } }),
       prisma.serviceType.findUnique({ where: { id: data.items[0].serviceTypeId } })
     ]);
@@ -78,14 +79,14 @@ export async function POST(request: NextRequest) {
       minute: '2-digit',
     }).format(new Date(data.startAt));
     const valor = (serviceType?.priceCents || 0) / 100;
-    const nomeBarbeiro = barberFull?.name || 'Barbeiro';
+  const nomeProfissional = professionalFull?.name || 'Profissional';
   // Separar data e hora para formatar "às"
   const [dataStr, horaStrRaw] = dateBr.split(', ');
   // Adiciona 'h' ao final do horário (ex: 13:00h)
   const horaStr = horaStrRaw ? `${horaStrRaw}h` : '';
   const dataHoraBr = `${dataStr} às ${horaStr}`;
-  const msg = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço ${serviceType?.name || ''} (R$ ${valor.toFixed(2)}) com o barbeiro ${nomeBarbeiro} em nossa barbearia. Obrigado pela confiança! 😊`;
-  const msgHtml = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço <strong>${serviceType?.name || ''}</strong> (R$ ${valor.toFixed(2)}) com o barbeiro ${nomeBarbeiro} em nossa barbearia. Obrigado pela confiança! 😊`;
+  const msg = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço ${serviceType?.name || ''} (R$ ${valor.toFixed(2)}) com o profissional ${nomeProfissional} em nosso estabelecimento. Obrigado pela confiança! 😊`;
+  const msgHtml = `${clientFull?.name || 'Cliente'}, foi criado um agendamento para ${dataHoraBr} do serviço <strong>${serviceType?.name || ''}</strong> (R$ ${valor.toFixed(2)}) com o profissional ${nomeProfissional} em nosso estabelecimento. Obrigado pela confiança! 😊`;
     // Envia e-mail para cliente
     if (clientFull?.email) {
       await sendMail({
@@ -95,17 +96,17 @@ export async function POST(request: NextRequest) {
         html: msgHtml
       });
     }
-    // Envia e-mail para barbeiro
-    if (barberFull?.email) {
+    // Envia e-mail para profissional
+    if (professionalFull?.email) {
       await sendMail({
-        to: barberFull.email,
-        subject: 'Novo Agendamento - Barbearia',
+        to: professionalFull.email,
+        subject: 'Novo Agendamento - Estabelecimento',
         text: msg,
         html: msgHtml
       });
     }
     return NextResponse.json({ success: true, message: 'Agendamento criado com sucesso!', appointment });
-  // Agora appointment já vem com barber, client e items.serviceType populados
+  // Agora appointment já vem com professional, client e items.serviceType populados
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 400 });
   }
@@ -129,11 +130,11 @@ export async function GET(request: NextRequest) {
 
     const serviceTypeId = searchParams.get('serviceTypeId');
     const clientName = searchParams.get('clientName');
-    const barberName = searchParams.get('barberName');
+  const professionalName = searchParams.get('professionalName');
     const q = searchParams.get('q');
 
     const where: Record<string, unknown> = {};
-    where.barberId = searchParams.get('barberId') ?? undefined;
+  where.professionalId = searchParams.get('professionalId') ?? undefined;
     where.clientId = searchParams.get('clientId') ?? undefined;
     if (status) {
       if (Array.isArray(status)) {
@@ -173,7 +174,7 @@ export async function GET(request: NextRequest) {
     if (q) {
       where.OR = [
         { client: { name: { contains: q, mode: 'insensitive' } } },
-        { barber: { name: { contains: q, mode: 'insensitive' } } },
+        { professional: { name: { contains: q, mode: 'insensitive' } } },
         { items: { some: { serviceType: { name: { contains: q, mode: 'insensitive' } } } } },
       ];
     } else {
@@ -181,9 +182,9 @@ export async function GET(request: NextRequest) {
       if (clientName) {
         where.client = { name: { contains: clientName, mode: 'insensitive' } };
       }
-      // Filtro por nome do barbeiro (busca textual, case-insensitive)
-      if (barberName) {
-        where.barber = { name: { contains: barberName, mode: 'insensitive' } };
+      // Filtro por nome do profissional (busca textual, case-insensitive)
+      if (professionalName) {
+        where.professional = { name: { contains: professionalName, mode: 'insensitive' } };
       }
     }
 
@@ -204,15 +205,15 @@ export async function GET(request: NextRequest) {
     // Busca paginada
     const include: {
       items: { include: { serviceType: boolean } };
-      barber?: boolean;
+      professional?: boolean;
       client?: { select: { id: true; name: true } };
       payment?: boolean;
     } = { items: { include: { serviceType: true } }, payment: true };
-    // Permitir incluir barbeiro se solicitado (para compatibilidade com frontend)
-    if (searchParams.get('includeBarber') === 'true') {
-      include.barber = true;
+    // Permitir incluir profissional se solicitado (para compatibilidade com frontend)
+    if (searchParams.get('includeProfessional') === 'true') {
+      include.professional = true;
     }
-    // Permitir incluir client se solicitado (para mostrar nome do cliente na tabela do barbeiro)
+    // Permitir incluir client se solicitado (para mostrar nome do cliente na tabela do profissional)
     if (searchParams.get('includeClient') === 'true') {
       include.client = { select: { id: true, name: true } };
     }

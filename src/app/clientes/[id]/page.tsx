@@ -27,7 +27,7 @@ interface Appointment {
   status: string;
   items: AppointmentItem[];
   payment?: Payment;
-  barber?: { id: string; name: string };
+  professional?: { id: string; name: string };
 }
 
 interface Payment {
@@ -56,7 +56,7 @@ export default function ClienteDetalhePage() {
     setLoading(true);
     Promise.all([
       fetch(`/api/clients/${clientId}`).then((res) => res.json()),
-      fetch(`/api/appointments?clientId=${clientId}&page=1&pageSize=50&includeBarber=true&includeServiceType=true`).then((res) => res.json()),
+  fetch(`/api/appointments?clientId=${clientId}&page=1&pageSize=50&includeProfessional=true&includeServiceType=true`).then((res) => res.json()),
     ])
       .then(([clientData, appointmentsData]) => {
         setClient(clientData.client || null);
@@ -151,7 +151,7 @@ export default function ClienteDetalhePage() {
     conteudo = (
       <>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Cliente: {client.name}</h1>
+          <h1 className="text-2xl font-bold brand-title">Cliente: {client.name}</h1>
           <div className="flex gap-2">
             {editMode ? (
               <>

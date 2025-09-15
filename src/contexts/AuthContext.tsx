@@ -1,19 +1,28 @@
 "use client";
 import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from "react";
 
+
+interface AuthUser {
+  id: string;
+  email: string;
+  role: string;
+  tenantId?: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: { id: string; email: string; role: string } | null;
+  user: AuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   fetchAuthed: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 }
 
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<{ id: string; email: string; role: string } | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   // Restaurar sessão do cookie ao carregar
   useEffect(() => {

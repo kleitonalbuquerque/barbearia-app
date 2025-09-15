@@ -1,3 +1,22 @@
+// Atualizar telefone e cpf de um cliente existente
+export async function PATCH(request: Request) {
+  try {
+    const data = await request.json();
+    if (!data.email) {
+      return NextResponse.json({ success: false, error: 'Email é obrigatório para atualizar.' }, { status: 400 });
+    }
+    const updated = await prisma.client.update({
+      where: { email: data.email },
+      data: {
+        phone: data.phone,
+        cpf: data.cpf,
+      },
+    });
+    return NextResponse.json({ success: true, message: 'Cliente atualizado com sucesso!', client: updated });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+  }
+}
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
@@ -17,12 +36,16 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json({ success: false, error: 'Já existe cliente com este email ou CPF.' }, { status: 400 });
     }
+    if (!data.tenantId) {
+      return NextResponse.json({ success: false, error: 'tenantId é obrigatório.' }, { status: 400 });
+    }
     const client = await prisma.client.create({
       data: {
         name: data.name,
         email: data.email ? data.email : null,
         phone: data.phone ? data.phone : null,
         cpf: data.cpf ? data.cpf : null,
+        tenant: { connect: { id: data.tenantId } },
       },
     });
     return NextResponse.json({ success: true, message: 'Cliente criado com sucesso!', client });

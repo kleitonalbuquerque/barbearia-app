@@ -1,8 +1,8 @@
 interface AgendamentosTableProps {
   appointments: Appointment[];
   emptyServiceMessageClient?: string;
-  emptyServiceMessageBarber?: string;
-  context?: "client" | "barber";
+  emptyServiceMessageProfessional?: string;
+  context?: "client" | "professional";
   onRowClick?: (appt: Appointment) => void;
 }
 import React from "react";
@@ -32,7 +32,7 @@ export interface Appointment {
   status: string;
   items: AppointmentItem[];
   payment?: Payment;
-  barber?: { id: string; name: string };
+  professional?: { id: string; name: string };
   client?: { name: string };
 }
 
@@ -57,7 +57,7 @@ function getStatusColor(status: string) {
   return "text-gray-700";
 }
 
-function getColumns(context: "client" | "barber" = "barber", onEditClick?: (appt: Appointment) => void): DataTableColumn<Appointment>[] {
+function getColumns(context: "client" | "professional" = "professional", onEditClick?: (appt: Appointment) => void): DataTableColumn<Appointment>[] {
   const columns: DataTableColumn<Appointment>[] = [
     {
       key: "startAt",
@@ -86,7 +86,7 @@ function getColumns(context: "client" | "barber" = "barber", onEditClick?: (appt
           : "-",
       className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
     },
-    context === "barber"
+    context === "professional"
       ? {
           key: "client",
           header: "Cliente",
@@ -94,9 +94,9 @@ function getColumns(context: "client" | "barber" = "barber", onEditClick?: (appt
           className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
         }
       : {
-          key: "barber",
-          header: "Barbeiro",
-          render: (appt: Appointment) => appt.barber?.name || "-",
+          key: "professional",
+          header: "Profissional",
+          render: (appt: Appointment) => appt.professional?.name || "-",
           className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
         },
     {
@@ -139,8 +139,8 @@ function getColumns(context: "client" | "barber" = "barber", onEditClick?: (appt
       },
       className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
     },
-    // Coluna de detalhes (ícone olho) só para barbeiro
-    ...(context === "barber"
+  // Coluna de detalhes (ícone olho) só para profissional
+    ...(context === "professional"
       ? [{
           key: "detalhes",
           header: "Detalhes",
@@ -174,11 +174,11 @@ function getColumns(context: "client" | "barber" = "barber", onEditClick?: (appt
   return columns;
 }
 
-const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageBarber = "Nenhum serviço agendado para este barbeiro.", context = "barber", onRowClick }) => (
+const AgendamentosTable: React.FC<AgendamentosTableProps> = ({ appointments, emptyServiceMessageClient = "Nenhum serviço agendado para este cliente.", emptyServiceMessageProfessional = "Nenhum serviço agendado para este profissional.", context = "professional", onRowClick }) => (
   <DataTable
     columns={getColumns(context, onRowClick)}
     data={appointments}
-    emptyMessage={context === "client" ? emptyServiceMessageClient : emptyServiceMessageBarber}
+    emptyMessage={context === "client" ? emptyServiceMessageClient : emptyServiceMessageProfessional}
     rowKey={(row) => row.id}
     onRowClick={onRowClick}
   />

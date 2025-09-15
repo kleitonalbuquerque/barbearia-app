@@ -8,13 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import AgendamentosTable from "@/components/AgendamentosTable";
 import AppointmentEditModal from "@/components/AppointmentEditModal";
 
-interface Barber {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  cpf: string;
-}
+
 
 interface AppointmentItem {
   id: string;
@@ -32,6 +26,7 @@ interface Appointment {
   items: AppointmentItem[];
   payment?: Payment;
   client?: { name: string };
+  professional?: { id: string; name: string };
 }
 
 interface Payment {
@@ -43,12 +38,12 @@ interface Payment {
 
 const PAYMENT_METHODS = ["CASH", "PIX", "CREDIT", "DEBIT"];
 
-export default function BarbeiroDetalhePage() {
+export default function ProfessionalDetalhePage() {
   const { fetchAuthed } = useAuth();
   const params = useParams();
   const router = useRouter();
-  const barberId = params?.id as string;
-  const [barber, setBarber] = useState<Barber | null>(null);
+  const professionalId = params?.id as string;
+  const [professional, setProfessional] = useState<{ id: string; name: string; email: string; phone: string; cpf: string } | null>(null);
   const { serviceTypes } = useServiceTypes();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,30 +60,30 @@ export default function BarbeiroDetalhePage() {
   const [endDate, setEndDate] = useState<Date | null>(null);
 
   useEffect(() => {
-    if (!barberId) return;
+    if (!professionalId) return;
     setLoading(true);
     Promise.all([
-      fetch(`/api/barbers/${barberId}`).then((res) => res.json()),
-      fetch(`/api/appointments?barberId=${barberId}&page=1&pageSize=50&includeClient=true&includeServiceType=true`).then((res) => res.json()),
+      fetch(`/api/professionals/${professionalId}`).then((res) => res.json()),
+      fetch(`/api/appointments?professionalId=${professionalId}&page=1&pageSize=50&includeClient=true&includeServiceType=true`).then((res) => res.json()),
     ])
-      .then(([barberData, appointmentsData]) => {
-        setBarber(barberData.barber || null);
-        // Inclui o campo barber em cada appointment
-        const barberObj = barberData.barber ? { id: barberData.barber.id, name: barberData.barber.name } : undefined;
-        const appointmentsWithBarber = (appointmentsData.appointments || []).map((appt: Appointment) => ({
+      .then(([professionalData, appointmentsData]) => {
+        // Inclui o campo professional em cada appointment
+        const professionalObj = professionalData.professional ? { id: professionalData.professional.id, name: professionalData.professional.name } : undefined;
+        const appointmentsWithProfessional = (appointmentsData.appointments || []).map((appt: Appointment) => ({
           ...appt,
-          barber: barberObj,
+          professional: professionalObj,
         }));
-        setAppointments(appointmentsWithBarber);
+        setAppointments(appointmentsWithProfessional);
+        setProfessional(professionalData.professional || null);
         setForm({
-          name: barberData.barber?.name || "",
-          email: barberData.barber?.email || "",
-          phone: barberData.barber?.phone || "",
-          cpf: barberData.barber?.cpf || "",
+          name: professionalData.professional?.name || "",
+          email: professionalData.professional?.email || "",
+          phone: professionalData.professional?.phone || "",
+          cpf: professionalData.professional?.cpf || "",
         });
       })
       .finally(() => setLoading(false));
-  }, [barberId]);
+  }, [professionalId]);
 
   function handleEdit() {
     setEditMode(true);
@@ -98,12 +93,12 @@ export default function BarbeiroDetalhePage() {
 
   function handleCancel() {
     setEditMode(false);
-    if (barber) {
+    if (professional) {
       setForm({
-        name: barber.name,
-        email: barber.email,
-        phone: barber.phone,
-        cpf: barber.cpf,
+        name: professional.name,
+        email: professional.email,
+        phone: professional.phone,
+        cpf: professional.cpf,
       });
     }
     setError("");
@@ -115,7 +110,7 @@ export default function BarbeiroDetalhePage() {
     setSaving(true);
     setError("");
     setSuccess("");
-    const res = await fetchAuthed(`/api/barbers/${barberId}`, {
+  const res = await fetchAuthed(`/api/professionals/${professionalId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -124,33 +119,33 @@ export default function BarbeiroDetalhePage() {
     setSaving(false);
     if (data.success) {
       setSuccess("Dados atualizados com sucesso!");
-      setBarber({ ...barber!, ...form });
+      setProfessional({ ...professional!, ...form });
       setEditMode(false);
     } else {
-      setError(data.error || "Erro ao atualizar barbeiro.");
+      setError(data.error || "Erro ao atualizar profissional.");
     }
   }
 
   async function handleDelete() {
-    if (!confirm("Tem certeza que deseja excluir este barbeiro?")) return;
+  if (!confirm("Tem certeza que deseja excluir este profissional?")) return;
     setSaving(true);
     setError("");
     setSuccess("");
     try {
-      const res = await fetchAuthed(`/api/barbers/${barberId}`, {
+  const res = await fetchAuthed(`/api/professionals/${professionalId}`, {
         method: "DELETE",
       });
       const data = await res.json();
       setSaving(false);
       if (data.success) {
-        setSuccess("Barbeiro excluído com sucesso!");
-        setTimeout(() => router.push("/barbeiros"), 1200);
+        setSuccess("Profissional excluído com sucesso!");
+        setTimeout(() => router.push("/professionals"), 1200);
       } else {
-        setError(data.error || "Erro ao excluir barbeiro.");
+        setError(data.error || "Erro ao excluir profissional.");
       }
-    } catch (err) {
+    } catch {
       setSaving(false);
-      setError("Erro ao excluir barbeiro.");
+      setError("Erro ao excluir profissional.");
     }
   }
 
@@ -171,11 +166,11 @@ export default function BarbeiroDetalhePage() {
   let conteudo;
   if (loading) {
     conteudo = <p>Carregando...</p>;
-  } else if (barber) {
+  } else if (professional) {
     conteudo = (
       <>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Barbeiro: {barber.name}</h1>
+          <h1 className="text-2xl font-bold brand-title">Profissional: {professional.name}</h1>
           <div className="flex gap-2">
             {editMode ? (
               <>
@@ -222,70 +217,75 @@ export default function BarbeiroDetalhePage() {
         <section className="mb-8">
           {editMode ? (
             <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-md">
-              <label htmlFor="name" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Nome</label>
+              <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
               <input
                 id="name"
-                className="p-3 border-2 border-blue-500 focus:ring-2 focus:ring-blue-400 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 font-bold"
+                className="p-3 border-2 border-pink-500 focus:ring-2 focus:ring-pink-400 rounded text-gray-900 bg-white placeholder-gray-500 font-bold"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
                 required
                 autoFocus
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Email</label>
+              <label htmlFor="email" className="text-sm font-semibold brand-title">Email</label>
               <input
                 id="email"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 type="email"
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="phone" className="text-sm font-semibold text-gray-700 dark:text-gray-200">Telefone</label>
+              <label htmlFor="phone" className="text-sm font-semibold brand-title">Telefone</label>
               <input
                 id="phone"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
+                style={{ background: '#fff' }}
               />
-              <label htmlFor="cpf" className="text-sm font-semibold text-gray-700 dark:text-gray-200">CPF</label>
+              <label htmlFor="cpf" className="text-sm font-semibold brand-title">CPF</label>
               <input
                 id="cpf"
-                className="p-3 border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
                 name="cpf"
                 value={form.cpf}
                 onChange={handleChange}
+                style={{ background: '#fff' }}
               />
-              <hr className="my-4 border-gray-300 dark:border-gray-700" />
+              <hr className="my-4 border-gray-300" />
               {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
               {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
             </form>
           ) : (
             <>
-              <strong>Email:</strong> {barber.email} <br />
-              <strong>Telefone:</strong> {barber.phone} <br />
-              <strong>CPF:</strong> {barber.cpf}
+              <strong>Email:</strong> {professional.email} <br />
+              <strong>Telefone:</strong> {professional.phone} <br />
+              <strong>CPF:</strong> {professional.cpf}
               <hr className="my-4 border-gray-300 dark:border-gray-700" />
             </>
           )}
         </section>
         <section className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-            <h2 className="text-lg font-semibold text-white">Serviços realizados/cancelados</h2>
-            <span className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
+            <h2 className="text-lg font-semibold brand-title">Serviços realizados/cancelados</h2>
+            <span className="text-sm font-semibold brand-title">
               Serviços concluídos: {appointments.filter(a => a.status === 'COMPLETED' || a.status === 'CONCLUÍDO').length}
             </span>
           </div>
           <div className="flex flex-wrap gap-2 mb-4 items-end justify-between">
             <div className="flex flex-wrap gap-2 items-end">
               <div className="flex flex-col">
-                <label htmlFor="statusFilter" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Filtrar por status</label>
+                <label htmlFor="statusFilter" className="text-xs font-semibold brand-title mb-1">Filtrar por status</label>
                 <select
                   id="statusFilter"
-                  className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"
                   value={statusFilter}
                   onChange={e => setStatusFilter(e.target.value)}
+                  style={{ background: '#fff' }}
                 >
                   <option value="">Todos</option>
                   <option value="SCHEDULED">Agendado</option>
@@ -294,30 +294,33 @@ export default function BarbeiroDetalhePage() {
                 </select>
               </div>
               <div className="flex flex-col">
-                <label htmlFor="date" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Buscar por data</label>
+                <label htmlFor="date" className="text-xs font-semibold brand-title mb-1">Buscar por data</label>
                 <TailwindDatePicker
                   id="date"
                   value={date}
                   onChange={setDate}
                   placeholder="Selecione a data"
+                  inputClassName="p-2 h-[42px] border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
               </div>
               <div className="flex flex-col">
-                <label htmlFor="startDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data início</label>
+                <label htmlFor="startDate" className="text-xs font-semibold brand-title mb-1">Data início</label>
                 <TailwindDatePicker
                   id="startDate"
                   value={startDate}
                   onChange={setStartDate}
                   placeholder="Data início"
+                  inputClassName="p-2 h-[42px] border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
               </div>
               <div className="flex flex-col">
-                <label htmlFor="endDate" className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1">Data fim</label>
+                <label htmlFor="endDate" className="text-xs font-semibold brand-title mb-1">Data fim</label>
                 <TailwindDatePicker
                   id="endDate"
                   value={endDate}
                   onChange={setEndDate}
                   placeholder="Data fim"
+                  inputClassName="p-2 h-[42px] border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
               </div>
             </div>
@@ -338,7 +341,7 @@ export default function BarbeiroDetalhePage() {
           </div>
           <AgendamentosTable
             appointments={filteredAppointments}
-            context="barber"
+            context="professional"
             onRowClick={(appt) => setEditAppointment(appt)}
           />
           {editAppointment && (
@@ -354,10 +357,10 @@ export default function BarbeiroDetalhePage() {
                 const startAt = data.date.toISOString();
                 const endAt = new Date(data.date.getTime() + (editAppointment.items?.[0]?.durationMinutesSnapshot || 30) * 60000).toISOString();
                 // Checar conflito (ignorar o próprio agendamento)
-                const res = await fetch(`/api/appointments?barberId=${barberId}&startAt=${startAt}&endAt=${endAt}`);
+                const res = await fetch(`/api/appointments?professionalId=${professionalId}&startAt=${startAt}&endAt=${endAt}`);
                 const result = await res.json();
                 if (result.appointments && result.appointments.some((appt: Appointment) => appt.id !== editAppointment.id)) {
-                  throw new Error("Conflito de horário para o barbeiro neste período.");
+                  throw new Error("Conflito de horário para o profissional neste período.");
                 }
               }
               // Salvar edição
@@ -370,12 +373,12 @@ export default function BarbeiroDetalhePage() {
                     create?: { method: string; amountCents: number };
                   };
                   serviceTypeId?: string;
-                  barberId?: string;
+                  professionalId?: string;
                 } = {
                   startAt: data.date ? data.date.toISOString() : editAppointment.startAt,
                   status: data.status,
                   serviceTypeId: data.serviceTypeId,
-                  barberId: data.barberId,
+                  // professionalId não faz parte de AppointmentSaveData, removido
                 };
                 // Só envie payment se realmente for criar/alterar
                 if (
@@ -396,9 +399,7 @@ export default function BarbeiroDetalhePage() {
                 // Atualizar lista local
                 setAppointments((prev) => {
                   // Se o barberId mudou, remove da lista local
-                  if (data.barberId && data.barberId !== barberId) {
-                    return prev.filter((a) => a.id !== editAppointment.id);
-                  }
+                  // Se o profissional mudou, remove da lista local (não aplicável neste contexto, pois não há troca de profissional)
                   // Caso contrário, atualiza normalmente
                   return prev.map((a) => {
                     if (a.id !== editAppointment.id) return a;
@@ -435,7 +436,7 @@ export default function BarbeiroDetalhePage() {
       </>
     );
   } else {
-    conteudo = <p>Barbeiro não encontrado.</p>;
+  conteudo = <p>Profissional não encontrado.</p>;
   }
 
   return (
