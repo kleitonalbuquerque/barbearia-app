@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useTenant } from "@/contexts/TenantContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserTie, faScissors } from '@fortawesome/free-solid-svg-icons';
 import './AgendamentoModal.css';
@@ -38,6 +39,7 @@ interface AgendamentoModalProps {
 }
 
 export default function AgendamentoModal({ open, onClose, onCreated, serviceTypes, professionals, clients }: Readonly<AgendamentoModalProps>) {
+  const { tenantId } = useTenant();
   const [form, setForm] = useState({
     date: "",
     time: "",
@@ -72,7 +74,8 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
           clientId: form.clientId,
           startAt: startAt.toISOString(),
           endAt: endAt.toISOString(),
-          items: [{ serviceTypeId: form.serviceTypeId, priceCentsSnapshot, durationMinutesSnapshot }]
+          items: [{ serviceTypeId: form.serviceTypeId, priceCentsSnapshot, durationMinutesSnapshot }],
+          tenantId,
         })
       });
       const data = await res.json();
@@ -103,13 +106,13 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
         >
           &times;
         </button>
-        <h2 className="text-xl font-bold mb-4">Novo Agendamento</h2>
+  <h2 className="text-xl font-bold mb-4 text-white">Novo Agendamento</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label htmlFor="agendamento-date">Data</label>
+          <label htmlFor="agendamento-date" className="text-white">Data</label>
           <input id="agendamento-date" type="date" name="date" value={form.date} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full date-white" />
-          <label htmlFor="agendamento-time">Horário</label>
+          <label htmlFor="agendamento-time" className="text-white">Horário</label>
           <input id="agendamento-time" type="time" name="time" value={form.time} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white placeholder-gray-300 w-full time-white" />
-          <label htmlFor="agendamento-professional">Profissional</label>
+          <label htmlFor="agendamento-professional" className="text-white">Profissional</label>
           <div className="relative flex items-center">
             <select id="agendamento-professional" name="professionalId" value={form.professionalId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
               <option value="">Selecione</option>
@@ -117,7 +120,7 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
             </select>
             <FontAwesomeIcon icon={faUserTie} className="absolute right-3 text-white pointer-events-none z-10" />
           </div>
-          <label htmlFor="agendamento-client">Cliente</label>
+          <label htmlFor="agendamento-client" className="text-white">Cliente</label>
           <div className="relative flex items-center">
             <select id="agendamento-client" name="clientId" value={form.clientId} onChange={handleChange} required className="p-2 border rounded bg-gray-800 text-white w-full appearance-none pr-10" style={{ backgroundImage: 'none' }}>
               <option value="">Selecione</option>
@@ -125,7 +128,7 @@ export default function AgendamentoModal({ open, onClose, onCreated, serviceType
             </select>
             <FontAwesomeIcon icon={faUser} className="absolute right-3 text-white pointer-events-none z-10" />
           </div>
-          <label htmlFor="serviceTypeId">Tipo de Serviço</label>
+          <label htmlFor="serviceTypeId" className="text-white">Tipo de Serviço</label>
           <div className="relative flex items-center">
             <select
               id="serviceTypeId"

@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function NovoServicoPage() {
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
+  const { tenantId } = useTenant();
   const router = useRouter();
   const [form, setForm] = useState({ name: "", priceCents: "", durationMinutes: "" });
   const [saving, setSaving] = useState(false);
@@ -35,6 +37,7 @@ export default function NovoServicoPage() {
           name: form.name,
           priceCents,
           durationMinutes,
+          tenantId,
         }),
       });
       const data = await res.json();

@@ -105,11 +105,11 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
   <DialogBackdrop className="fixed inset-0 bg-black/60" />
       <div className="fixed inset-0 flex items-center justify-center">
         <DialogPanel className="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md z-10">
-          <DialogTitle className="text-lg font-bold mb-4">Editar Agendamento</DialogTitle>
+          <DialogTitle className="text-lg font-bold mb-4 text-white">Editar Agendamento</DialogTitle>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             {/* Profissional editável */}
             <div>
-              <label htmlFor="edit-professional" className="block text-sm font-semibold mb-1">Profissional</label>
+              <label htmlFor="edit-professional" className="block text-sm font-semibold mb-1 text-white">Profissional</label>
               <select
                 id="edit-professional"
                 className="p-2 border rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -126,7 +126,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
             {/* Nome do cliente (readonly) */}
             {appointment?.client?.name && (
               <div>
-                <label htmlFor="edit-client" className="block text-sm font-semibold mb-1">Cliente</label>
+                <label htmlFor="edit-client" className="block text-sm font-semibold mb-1 text-white">Cliente</label>
                 <input
                   id="edit-client"
                   type="text"
@@ -139,12 +139,12 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
             )}
             {/* Data e hora */}
             <div>
-              <label htmlFor="edit-date" className="block text-sm font-semibold mb-1">Data e hora</label>
+              <label htmlFor="edit-date" className="block text-sm font-semibold mb-1 text-white">Data e hora</label>
               <TailwindDatePicker id="edit-date" value={date} onChange={setDate} placeholder="dd/mm/yyyy" />
             </div>
             {/* Serviço e preço editáveis */}
             <div>
-              <label htmlFor="edit-service" className="block text-sm font-semibold mb-1">Serviço</label>
+              <label htmlFor="edit-service" className="block text-sm font-semibold mb-1 text-white">Serviço</label>
               <select
                 id="edit-service"
                 className="p-2 border rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -164,7 +164,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
               </select>
             </div>
             <div>
-              <label htmlFor="edit-price" className="block text-sm font-semibold mb-1">Preço</label>
+              <label htmlFor="edit-price" className="block text-sm font-semibold mb-1 text-white">Preço</label>
               <input
                 id="edit-price"
                 type="text"
@@ -176,7 +176,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
             </div>
             {/* Forma de pagamento */}
             <div>
-              <label htmlFor="edit-payment-method" className="block text-sm font-semibold mb-1">Forma de pagamento</label>
+              <label htmlFor="edit-payment-method" className="block text-sm font-semibold mb-1 text-white">Forma de pagamento</label>
                 <select
                   id="edit-payment-method"
                   className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -193,7 +193,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
             </div>
             {canEditStatus && (
               <div>
-                <label htmlFor="edit-status" className="block text-sm font-semibold mb-1">Status</label>
+                <label htmlFor="edit-status" className="block text-sm font-semibold mb-1 text-white">Status</label>
                 <select
                   id="edit-status"
                   className="p-2 h-[42px] border border-gray-300 rounded text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
