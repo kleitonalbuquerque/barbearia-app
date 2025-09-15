@@ -26,7 +26,6 @@ export default function FinanceiroPage() {
   const professionalDropdownRef = useRef<HTMLDivElement>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [professionals, setProfessionals] = useState<Professional[]>([]);

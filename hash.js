@@ -1,5 +1,5 @@
 // Salve este código como hash.js e execute com: node hash.js
-const bcrypt = require("bcryptjs");
+import bcrypt from "bcryptjs";
 
 const senha = "admin";
 const saltRounds = 10;

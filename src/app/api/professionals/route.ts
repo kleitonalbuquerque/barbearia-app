@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // Criar profissional
 export async function POST(request: NextRequest) {
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
     const tenantId = searchParams.get('tenantId');
-  const where: Record<string, any> = {};
+  const where: Prisma.ProfessionalWhereInput = {};
     if (tenantId) where.tenantId = tenantId;
     if (q) {
       where.OR = [
