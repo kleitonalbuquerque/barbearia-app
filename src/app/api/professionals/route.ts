@@ -21,6 +21,11 @@ export async function POST(request: NextRequest) {
     if (!data.tenantId) {
       return NextResponse.json({ success: false, error: 'tenantId é obrigatório.' }, { status: 400 });
     }
+    // Busca o Tenant pelo slug/subdomínio
+    const tenant = await prisma.tenant.findUnique({ where: { subdomain: data.tenantId } });
+    if (!tenant) {
+      return NextResponse.json({ success: false, error: 'Tenant não encontrado para o subdomínio informado.' }, { status: 404 });
+    }
     const professional = await prisma.professional.create({
       data: {
         name: data.name,
@@ -29,7 +34,7 @@ export async function POST(request: NextRequest) {
         cpf: data.cpf ? data.cpf : null,
         cnpj: data.cnpj ? data.cnpj : null,
         status: 'ACTIVE',
-        tenant: { connect: { id: data.tenantId } },
+        tenant: { connect: { id: tenant.id } },
       },
     });
     return NextResponse.json({
@@ -55,8 +60,13 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
     const take = pageSize;
-    const tenantId = searchParams.get('tenantId');
-  const where: Prisma.ProfessionalWhereInput = {};
+    const tenantSlug = searchParams.get('tenantId');
+    let tenantId: string | undefined = undefined;
+    if (tenantSlug) {
+      const tenant = await prisma.tenant.findUnique({ where: { subdomain: tenantSlug } });
+      if (tenant) tenantId = tenant.id;
+    }
+    const where: Prisma.ProfessionalWhereInput = {};
     if (tenantId) where.tenantId = tenantId;
     if (q) {
       where.OR = [

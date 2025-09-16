@@ -65,16 +65,21 @@ export async function GET(request: Request) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
     const take = pageSize;
-    let where = {};
+    const tenantSlug = searchParams.get('tenantId');
+    let tenantId: string | undefined = undefined;
+    if (tenantSlug) {
+      const tenant = await prisma.tenant.findUnique({ where: { subdomain: tenantSlug } });
+      if (tenant) tenantId = tenant.id;
+    }
+  const where: import('@prisma/client').Prisma.ClientWhereInput = {};
+    if (tenantId) where.tenantId = tenantId;
     if (q) {
-      where = {
-        OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { email: { contains: q, mode: 'insensitive' } },
-          { phone: { contains: q, mode: 'insensitive' } },
-          { cpf: { contains: q, mode: 'insensitive' } },
-        ],
-      };
+      where.OR = [
+        { name: { contains: q, mode: 'insensitive' } },
+        { email: { contains: q, mode: 'insensitive' } },
+        { phone: { contains: q, mode: 'insensitive' } },
+        { cpf: { contains: q, mode: 'insensitive' } },
+      ];
     }
     const total = await prisma.client.count({ where });
     const clients = await prisma.client.findMany({

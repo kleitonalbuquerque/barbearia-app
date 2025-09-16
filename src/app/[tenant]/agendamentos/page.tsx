@@ -20,7 +20,7 @@ interface ServiceType { id: string; name: string; priceCents: number; }
 
 export default function AgendamentosPage() {
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
-  // Extrai o tenant da URL: /{tenant}/agendamentos
+  // Extrai o tenant da URL: /[tenant]/agendamentos
   const tenant = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);

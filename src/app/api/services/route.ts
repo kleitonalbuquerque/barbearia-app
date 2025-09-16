@@ -40,12 +40,19 @@ export async function GET(request: Request) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
     const skip = (page - 1) * pageSize;
     const take = pageSize;
-    let where = {};
-    if (q) {
-      where = {
-        name: { contains: q, mode: 'insensitive' },
-      };
-    }
+      const tenantSlug = searchParams.get('tenantId');
+      let tenantId: string | undefined = undefined;
+      if (tenantSlug) {
+        const tenant = await prisma.tenant.findUnique({ where: { subdomain: tenantSlug } });
+        if (tenant) tenantId = tenant.id;
+      }
+    const where: import('@prisma/client').Prisma.ServiceTypeWhereInput = {};
+      if (tenantId) where.tenantId = tenantId;
+      if (q) {
+        where.OR = [
+          { name: { contains: q, mode: 'insensitive' } },
+        ];
+      }
     const total = await prisma.serviceType.count({ where });
     const services = await prisma.serviceType.findMany({
       where,

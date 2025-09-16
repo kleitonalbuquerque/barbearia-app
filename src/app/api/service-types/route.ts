@@ -38,7 +38,17 @@ export async function POST(request: NextRequest) {
 // Listar tipos de serviço
 export async function GET() {
   try {
-    const serviceTypes = await prisma.serviceType.findMany();
+    // Recebe tenantId via query
+    const searchParams = typeof window === 'undefined' ? new URL(globalThis.location?.href || '').searchParams : new URL(window.location.href).searchParams;
+    const tenantSlug = searchParams.get('tenantId');
+    let tenantId: string | undefined = undefined;
+    if (tenantSlug) {
+      const tenant = await prisma.tenant.findUnique({ where: { subdomain: tenantSlug } });
+      if (tenant) tenantId = tenant.id;
+    }
+  const where: import('@prisma/client').Prisma.ServiceTypeWhereInput = {};
+    if (tenantId) where.tenantId = tenantId;
+    const serviceTypes = await prisma.serviceType.findMany({ where });
     return NextResponse.json({ success: true, serviceTypes });
   } catch (error) {
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });

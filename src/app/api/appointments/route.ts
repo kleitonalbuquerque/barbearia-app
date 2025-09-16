@@ -117,6 +117,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
+    // Filtro por tenantId (slug)
+    const tenantSlug = searchParams.get('tenantId');
+    let tenantId: string | undefined = undefined;
+    if (tenantSlug) {
+      const tenant = await prisma.tenant.findUnique({ where: { subdomain: tenantSlug } });
+      if (tenant) tenantId = tenant.id;
+    }
+
     // Filtros
     const statusParam = searchParams.get('status');
     let status: string | string[] | undefined = undefined;
@@ -130,11 +138,12 @@ export async function GET(request: NextRequest) {
 
     const serviceTypeId = searchParams.get('serviceTypeId');
     const clientName = searchParams.get('clientName');
-  const professionalName = searchParams.get('professionalName');
+    const professionalName = searchParams.get('professionalName');
     const q = searchParams.get('q');
 
     const where: Record<string, unknown> = {};
-  where.professionalId = searchParams.get('professionalId') ?? undefined;
+    if (tenantId) where.tenantId = tenantId;
+    where.professionalId = searchParams.get('professionalId') ?? undefined;
     where.clientId = searchParams.get('clientId') ?? undefined;
     if (status) {
       if (Array.isArray(status)) {

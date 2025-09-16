@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTenant } from "@/contexts/TenantContext";
+// import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
 
-	export default function NovoProfissionalPage() {
-		const { fetchAuthed, user } = useAuth();
-		const { tenantId } = useTenant();
-		const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "", cnpj: "" });
-		const [saving, setSaving] = useState(false);
-		const [error, setError] = useState("");
-		const [success, setSuccess] = useState("");
-		const router = useRouter();
+		export default function NovoProfissionalPage() {
+			const { fetchAuthed } = useAuth();
+			// Extrai o tenant da URL: /[tenant]/professionals/novo
+			const tenantFromUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+			const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "", cnpj: "" });
+			const [saving, setSaving] = useState(false);
+			const [error, setError] = useState("");
+			const [success, setSuccess] = useState("");
+			const router = useRouter();
 
 		function validateEmail(email: string) {
 			return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -48,10 +49,10 @@ import { useRouter } from "next/navigation";
 				setError("");
 				setSuccess("");
 				try {
-					// Usa tenantId do contexto, se não houver pega do usuário autenticado
-					const effectiveTenantId = tenantId || user?.tenantId;
+					// Usa tenant extraído da URL
+					const effectiveTenantId = tenantFromUrl;
 					if (!effectiveTenantId) {
-						setError("TenantId não encontrado. Faça login novamente ou selecione um negócio.");
+						setError("TenantId não encontrado na URL. Faça login novamente ou selecione um negócio.");
 						setSaving(false);
 						return;
 					}
@@ -64,7 +65,7 @@ import { useRouter } from "next/navigation";
 					setSaving(false);
 					if (data.success) {
 						setSuccess("Profissional cadastrado com sucesso!");
-						setTimeout(() => router.push("/professionals"), 1200);
+						setTimeout(() => router.push(`/${tenantFromUrl}/professionals`), 1200);
 					} else {
 						setError(data.error || "Erro ao cadastrar profissional.");
 					}

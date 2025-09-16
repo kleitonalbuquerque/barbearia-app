@@ -7,7 +7,17 @@ import { useAuth } from "../contexts/AuthContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
-const menuItems = [
+function getTenantFromPath(pathname: string) {
+  const parts = pathname.split("/").filter(Boolean);
+  // Se o primeiro segmento não for uma rota conhecida, assume que é o tenant
+  const knownRoutes = ["agendamentos","sobre","clientes","professionals","servicos","financeiro","usuarios"];
+  if (parts.length > 1 && !knownRoutes.includes(parts[0])) return parts[0];
+  return "";
+}
+
+function getMenuItems(tenant: string) {
+  const prefix = tenant ? `/${tenant}` : "";
+  return [
     { label: (
       <span className="flex items-center gap-1">
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -17,15 +27,17 @@ const menuItems = [
         </svg>
         Agendamentos
       </span>
-    ), href: "/agendamentos" },
-    { label: "Sobre", href: "/sobre" },
-    { label: "Clientes", href: "/clientes" },
-  { label: "Profissionais", href: "/professionals" },
-    { label: "Serviços", href: "/servicos" },
-];
+    ), href: `${prefix}/agendamentos` },
+    { label: "Sobre", href: `${prefix}/sobre` },
+    { label: "Clientes", href: `${prefix}/clientes` },
+    { label: "Profissionais", href: `${prefix}/professionals` },
+    { label: "Serviços", href: `${prefix}/servicos` },
+  ];
+}
 
 export default function NavMenu() {
   const pathname = usePathname();
+  const tenant = getTenantFromPath(pathname);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
@@ -79,7 +91,7 @@ export default function NavMenu() {
               Agenda360 <span className="text-xs font-normal text-gray-500 dark:text-gray-400 align-top ml-1">v0.1.0</span>
             </Link>
             <div className="hidden lg:flex items-center gap-6">
-              {menuItems.map((item) => (
+              {getMenuItems(tenant).map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -154,7 +166,7 @@ export default function NavMenu() {
           </button>
         </div>
         <nav className="flex flex-col gap-2 p-4">
-          {menuItems.map((item) => (
+          {getMenuItems(tenant).map((item) => (
             <Link
               key={item.href}
               href={item.href}
