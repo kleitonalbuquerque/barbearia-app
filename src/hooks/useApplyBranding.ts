@@ -5,6 +5,7 @@ import { useEffect } from "react";
 export function useApplyBranding() {
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (window.location.pathname === "/tenants/novo") return;
     const brandingRaw = window.localStorage.getItem("branding");
     if (!brandingRaw) return;
     try {

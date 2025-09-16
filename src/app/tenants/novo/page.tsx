@@ -82,7 +82,7 @@ export default function NovoTenantPage() {
 
   return (
     <div className="max-w-lg mx-auto p-4" style={{ background: "var(--background)", color: "var(--text)" }}>
-  <h1 className="text-2xl font-bold mb-6 brand-title">Novo Projeto / Negócio</h1>
+  <h1 className="text-2xl font-bold mb-6 text-white">Novo Projeto / Negócio</h1>
       <form
         onSubmit={handleSubmit}
         className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4"
