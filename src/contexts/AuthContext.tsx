@@ -26,6 +26,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   // Restaurar sessão do cookie ao carregar
   useEffect(() => {
+    const PUBLIC_PATHS = [
+      '/login',
+      '/tenants/novo',
+    ];
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      const isPublic = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + '/'));
+      if (isPublic) {
+        setLoading(false);
+        return;
+      }
+    }
     setLoading(true);
     fetch("/api/auth/me", { credentials: "include" })
       .then(res => res.json())
