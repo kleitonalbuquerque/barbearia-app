@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   if (!payload || payload.role !== 'ADMIN') {
     return NextResponse.json({ success: false, error: 'Acesso restrito a administradores' }, { status: 403 });
   }
-  const { name, email, password, phone = "", cpf = "", cnpj = "" } = await request.json();
+  const { name, email, password, phone = "", cpf = "", cnpj = "", tenantId } = await request.json();
   if (!name || !email || !password || !phone) {
     return NextResponse.json({ success: false, error: 'Dados obrigatórios ausentes (nome, email, senha e telefone)' }, { status: 400 });
   }
@@ -53,6 +53,6 @@ export async function POST(request: Request) {
   }
   // Cria admin
   const hash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({ data: { name, email, password: hash, phone, cpf: cpf || null, cnpj: cnpj || null, role: 'ADMIN' } });
+  const user = await prisma.user.create({ data: { name, email, password: hash, phone, cpf: cpf || null, cnpj: cnpj || null, role: 'ADMIN', tenantId } });
   return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
 }
