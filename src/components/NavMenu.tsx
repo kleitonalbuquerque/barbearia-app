@@ -11,7 +11,10 @@ function getTenantFromPath(pathname: string) {
   const parts = pathname.split("/").filter(Boolean);
   // Se o primeiro segmento não for uma rota conhecida, assume que é o tenant
   const knownRoutes = ["agendamentos","sobre","clientes","professionals","servicos","financeiro","usuarios"];
-  if (parts.length > 1 && !knownRoutes.includes(parts[0])) return parts[0];
+  // Se o primeiro segmento for um tenant válido (não rota conhecida), retorna
+  if (parts.length > 0 && !knownRoutes.includes(parts[0])) return parts[0];
+  // Se o segundo segmento for rota conhecida, retorna o primeiro como tenant
+  if (parts.length > 1 && knownRoutes.includes(parts[1])) return parts[0];
   return "";
 }
 
