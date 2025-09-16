@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   '/api/auth/logout',
   '/public',
   '/tenants/novo',
+  '/api/tenants',
 ];
 
 export function middleware(request: NextRequest) {
