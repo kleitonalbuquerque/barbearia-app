@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, phone, cpf, cnpj } = await request.json();
+    const { name, email, password, phone, cpf, cnpj, tenantId } = await request.json();
     // Verifica se já existe admin com email, cpf ou cnpj
     const existing = await prisma.user.findFirst({
       where: {
@@ -28,7 +28,8 @@ export async function POST(request: Request) {
         role: 'ADMIN',
         phone,
         cpf: cpf || null,
-        cnpj: cnpj || null
+        cnpj: cnpj || null,
+        tenantId
       }
     });
     return NextResponse.json({ success: true, user: { id: user.id, email: user.email, name: user.name } });
