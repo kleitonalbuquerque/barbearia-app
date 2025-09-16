@@ -84,9 +84,9 @@ export default function ProfessionalsPage() {
 			<ProfessionalsTable professionals={professionals} />
 			{/* Paginação */}
 			<div className="flex items-center justify-between mt-4">
-				<div>
-					<span style={{ color: '#000' }}>Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
-				</div>
+						<div>
+							<span className="text-black dark:text-white">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
+						</div>
 				<div className="flex gap-2 items-center">
 					<button
 						className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
