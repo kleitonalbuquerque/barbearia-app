@@ -60,7 +60,17 @@ const ProfessionalsTable: React.FC<ProfessionalsTableProps> = ({ professionals }
             aria-label="Ver detalhes"
             className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
             style={{ background: 'none', border: 'none', padding: 0 }}
-            onClick={() => router.push(`/professionals/${professional.id}`)}
+            onClick={() => {
+              let subdomain = '';
+              if (typeof window !== 'undefined') {
+                subdomain = window.localStorage.getItem('tenantSubdomain') || '';
+                if (!subdomain) {
+                  const parts = window.location.pathname.split('/').filter(Boolean);
+                  if (parts.length > 0 && parts[0] !== 'professionals') subdomain = parts[0];
+                }
+              }
+              router.push(`/${subdomain}/professionals/${professional.id}`);
+            }}
           >
             <FontAwesomeIcon icon={faEye} />
           </button>
