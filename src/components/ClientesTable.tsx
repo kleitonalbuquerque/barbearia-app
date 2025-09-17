@@ -46,19 +46,28 @@ const ClientesTable: React.FC<ClientesTableProps> = ({ clients }) => {
     {
       key: "detalhes",
       header: "Detalhes",
-      render: (client) => (
-        <div className="text-center">
-          <button
-            type="button"
-            aria-label="Ver detalhes"
-            className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
-            style={{ background: 'none', border: 'none', padding: 0 }}
-            onClick={() => router.push(`/clientes/${client.id}`)}
-          >
-            <FontAwesomeIcon icon={faEye} />
-          </button>
-        </div>
-      ),
+      render: (client) => {
+        // Extrai o tenant da URL atual
+        let tenant = "";
+        if (typeof window !== "undefined") {
+          const parts = window.location.pathname.split("/").filter(Boolean);
+          const knownRoutes = ["agendamentos","sobre","clientes","professionals","servicos","financeiro","usuarios"];
+          if (parts.length > 0 && !knownRoutes.includes(parts[0])) tenant = parts[0];
+        }
+        return (
+          <div className="text-center">
+            <button
+              type="button"
+              aria-label="Ver detalhes"
+              className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
+              style={{ background: 'none', border: 'none', padding: 0 }}
+              onClick={() => router.push(tenant ? `/${tenant}/clientes/${client.id}` : `/clientes/${client.id}`)}
+            >
+              <FontAwesomeIcon icon={faEye} />
+            </button>
+          </div>
+        );
+      },
   className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-900 dark:text-gray-100",
     },
   ];

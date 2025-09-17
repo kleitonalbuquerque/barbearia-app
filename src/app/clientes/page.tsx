@@ -46,9 +46,9 @@ export default function ClientesPage() {
     return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
   }
   return (
-    <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto">
+  <div className="w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 py-4 mx-auto bg-white">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold brand-title">Clientes</h1>
+  <h1 className="text-2xl font-bold text-gray-900">Clientes</h1>
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow transition"
           onClick={() => router.push("/clientes/novo")}
@@ -98,8 +98,8 @@ export default function ClientesPage() {
             <ClientesTable clients={clients} />
           {/* Paginação */}
           <div className="flex items-center justify-between mt-4">
-            <div className="text-white">
-              <span style={{ color: '#000' }}>Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
+            <div>
+              <span className="text-black">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
             </div>
             <div className="flex gap-2 items-center">
               <button
@@ -123,7 +123,7 @@ export default function ClientesPage() {
                 disabled={page >= Math.ceil(total / pageSize)}
               >Última</button>
               <select
-                className="ml-2 px-3 py-2 text-base border rounded bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                className="ml-2 px-3 py-2 text-base border rounded bg-white text-gray-900"
                 value={pageSize}
                 onChange={e => {
                   setPageSize(Number(e.target.value));

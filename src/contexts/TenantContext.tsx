@@ -3,30 +3,44 @@ import React, { createContext, useContext, useState, ReactNode, useMemo } from "
 
 interface TenantContextType {
   tenantId: string;
-  setTenantId: (id: string) => void;
+  subdomain: string;
+  setTenantId: (id: string, subdomain?: string) => void;
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
-  // Inicializa tenantId a partir do localStorage, query param ou vazio
-  const [tenantId, setTenantId] = useState<string>(() => {
+  // Inicializa tenantId e subdomain a partir do localStorage ou vazio
+  const [tenantId, setTenantIdState] = useState<string>(() => {
     if (typeof window !== "undefined") {
       const fromStorage = window.localStorage.getItem("tenantId");
       if (fromStorage) return fromStorage;
-      // Pode adicionar lógica para query param futuramente
+    }
+    return "";
+  });
+  const [subdomain, setSubdomainState] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const fromStorage = window.localStorage.getItem("tenantSubdomain");
+      if (fromStorage) return fromStorage;
     }
     return "";
   });
 
-  // Sempre que tenantId mudar, salva no localStorage
+  // Sempre que tenantId ou subdomain mudar, salva no localStorage
   React.useEffect(() => {
     if (tenantId) {
       window.localStorage.setItem("tenantId", tenantId);
     }
-  }, [tenantId]);
+    if (subdomain) {
+      window.localStorage.setItem("tenantSubdomain", subdomain);
+    }
+  }, [tenantId, subdomain]);
 
-  const value = useMemo(() => ({ tenantId, setTenantId }), [tenantId]);
+  const setTenantId = (id: string, subdomainValue?: string) => {
+    setTenantIdState(id);
+    if (subdomainValue) setSubdomainState(subdomainValue);
+  };
+  const value = useMemo(() => ({ tenantId, subdomain, setTenantId }), [tenantId, subdomain]);
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;
 }
 

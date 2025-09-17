@@ -87,7 +87,7 @@ export default function ClientesPage() {
       {/* Paginação */}
       <div className="flex items-center justify-between mt-4">
         <div>
-          <span style={{ color: '#000' }}>Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
+          <span className="text-black dark:text-white">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
         </div>
         <div className="flex gap-2 items-center">
           <button

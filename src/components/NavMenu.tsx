@@ -8,12 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 function getTenantFromPath(pathname: string) {
+  // Prioriza subdomínio salvo no localStorage
+  if (typeof window !== 'undefined') {
+    const subdomain = window.localStorage.getItem('tenantSubdomain');
+    if (subdomain) return subdomain;
+  }
   const parts = pathname.split("/").filter(Boolean);
-  // Se o primeiro segmento não for uma rota conhecida, assume que é o tenant
   const knownRoutes = ["agendamentos","sobre","clientes","professionals","servicos","financeiro","usuarios"];
-  // Se o primeiro segmento for um tenant válido (não rota conhecida), retorna
   if (parts.length > 0 && !knownRoutes.includes(parts[0])) return parts[0];
-  // Se o segundo segmento for rota conhecida, retorna o primeiro como tenant
   if (parts.length > 1 && knownRoutes.includes(parts[1])) return parts[0];
   return "";
 }

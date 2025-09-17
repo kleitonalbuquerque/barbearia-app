@@ -13,8 +13,10 @@ interface ServiceType {
 
 export default function ServicosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  // Extrai o tenant da URL: /[tenant]/servicos
-  const tenant = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+  // Extrai o subdomínio do localStorage ou da URL
+  const tenant = typeof window !== 'undefined'
+    ? window.localStorage.getItem('tenantSubdomain') || window.location.pathname.split('/')[1]
+    : '';
   const [services, setServices] = useState<ServiceType[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -84,7 +86,7 @@ export default function ServicosPage() {
       {/* Paginação */}
       <div className="flex items-center justify-between mt-4">
         <div>
-          <span style={{ color: '#000' }}>Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
+          <span className="text-gray-900 dark:text-white">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
         </div>
         <div className="flex gap-2 items-center">
           <button

@@ -43,13 +43,13 @@ export default function ProfessionalDetalhePage() {
   const params = useParams();
   const router = useRouter();
   const professionalId = params?.id as string;
-  const [professional, setProfessional] = useState<{ id: string; name: string; email: string; phone: string; cpf: string } | null>(null);
+  const [professional, setProfessional] = useState<{ id: string; name: string; email: string; phone: string; cpf: string; cnpj?: string } | null>(null);
   const { serviceTypes } = useServiceTypes();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editAppointment, setEditAppointment] = useState<Appointment | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "", cnpj: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -80,6 +80,7 @@ export default function ProfessionalDetalhePage() {
           email: professionalData.professional?.email || "",
           phone: professionalData.professional?.phone || "",
           cpf: professionalData.professional?.cpf || "",
+          cnpj: professionalData.professional?.cnpj || ""
         });
       })
       .finally(() => setLoading(false));
@@ -99,6 +100,7 @@ export default function ProfessionalDetalhePage() {
         email: professional.email,
         phone: professional.phone,
         cpf: professional.cpf,
+        cnpj: professional.cnpj || ""
       });
     }
     setError("");
@@ -165,7 +167,15 @@ export default function ProfessionalDetalhePage() {
 
   let conteudo;
   if (loading) {
-    conteudo = <p>Carregando...</p>;
+    conteudo = (
+      <div className="flex flex-col items-center justify-center py-12">
+        <svg className="animate-spin h-8 w-8 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <p className="text-white text-lg font-semibold">Carregando...</p>
+      </div>
+    );
   } else if (professional) {
     conteudo = (
       <>
@@ -256,15 +266,34 @@ export default function ProfessionalDetalhePage() {
                 onChange={handleChange}
                 style={{ background: '#fff' }}
               />
+              <label htmlFor="cnpj" className="text-sm font-semibold brand-title">CNPJ</label>
+              <input
+                id="cnpj"
+                className="p-3 border border-gray-300 rounded text-gray-900 bg-white placeholder-gray-500"
+                name="cnpj"
+                value={form.cnpj || ""}
+                onChange={handleChange}
+                style={{ background: '#fff' }}
+                placeholder="CNPJ"
+              />
               <hr className="my-4 border-gray-300" />
               {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
               {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
             </form>
           ) : (
             <>
-              <strong>Email:</strong> {professional.email} <br />
-              <strong>Telefone:</strong> {professional.phone} <br />
-              <strong>CPF:</strong> {professional.cpf}
+              <div className="mb-2">
+                <span className="font-semibold text-white">Email:</span> <span className="text-white">{professional.email}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-semibold text-white">Telefone:</span> <span className="text-white">{professional.phone}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-semibold text-white">CPF:</span> <span className="text-white">{professional.cpf}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-semibold text-white">CNPJ:</span> <span className="text-white">{professional.cnpj || "Não informado"}</span>
+              </div>
               <hr className="my-4 border-gray-300 dark:border-gray-700" />
             </>
           )}

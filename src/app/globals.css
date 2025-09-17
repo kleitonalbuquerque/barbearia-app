@@ -28,7 +28,7 @@
 :root {
   --primary: #ffffff;
   --secondary: #171717;
-  --accent: #f472b6;
+  --accent: #374151;
   --text: #000000;
   --background: var(--primary);
   --foreground: var(--secondary);

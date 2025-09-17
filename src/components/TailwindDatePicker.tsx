@@ -21,7 +21,7 @@ export default function TailwindDatePicker({ value, onChange, placeholder, id, i
         id={id}
         selected={value}
         onChange={onChange}
-        className={inputClassName || "p-2 border rounded w-full text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400"}
+  className={inputClassName || "p-2 border rounded w-full text-gray-900 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"}
         placeholderText={placeholder}
         showTimeSelect
         timeFormat="HH:mm"

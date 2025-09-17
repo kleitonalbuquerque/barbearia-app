@@ -243,9 +243,15 @@ export default function ClienteDetalhePage() {
             </form>
           ) : (
             <>
-              <strong>Email:</strong> {client.email} <br />
-              <strong>Telefone:</strong> {client.phone} <br />
-              <strong>CPF:</strong> {client.cpf}
+              <div className="mb-2">
+                <span className="font-semibold text-white">Email:</span> <span className="text-white">{client.email}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-semibold text-white">Telefone:</span> <span className="text-white">{client.phone}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-semibold text-white">CPF:</span> <span className="text-white">{client.cpf}</span>
+              </div>
               <hr className="my-4 border-gray-300 dark:border-gray-700" />
             </>
           )}
