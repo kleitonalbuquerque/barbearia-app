@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import ProfessionalsTable from "@/components/ProfessionalsTable";
+import Spinner from "@/components/Spinner";
 
 interface Professional {
 	id: string;
@@ -90,7 +91,7 @@ export default function ProfessionalsPage() {
 				</button>
 			</div>
 			{loading ? (
-				<p className="text-gray-700">Carregando...</p>
+				<div className="p-8 text-center"><Spinner /></div>
 			) : (
 				<>
 					<ProfessionalsTable professionals={professionals} />

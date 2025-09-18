@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import AgendamentosTable from "@/components/AgendamentosTable";
 import { useAuth } from "@/contexts/AuthContext";
+import Spinner from "@/components/Spinner";
 import AgendamentoModal from "@/components/agendamentos/AgendamentoModal";
 
 interface Appointment {
@@ -95,7 +96,7 @@ export default function AgendamentosPage() {
 
   let content;
   if (authLoading || loading) {
-    content = <div className="p-8 text-center text-gray-300">Carregando...</div>;
+    content = <div className="p-8 text-center"><Spinner /></div>;
   } else if (error) {
     content = <div className="p-8 text-center text-red-600">{error}</div>;
   } else {

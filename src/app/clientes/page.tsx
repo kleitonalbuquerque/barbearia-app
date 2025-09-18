@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import ClientesTable from "@/components/ClientesTable";
+import Spinner from "@/components/Spinner";
 
 interface Client {
   id: string;
@@ -92,7 +93,7 @@ export default function ClientesPage() {
         </button>
       </div>
       {loading ? (
-        <p className="text-gray-300">Carregando...</p>
+        <div className="p-8 text-center"><Spinner /></div>
       ) : (
         <>
             <ClientesTable clients={clients} />

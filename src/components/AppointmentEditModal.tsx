@@ -5,6 +5,7 @@ import { useProfessionals } from "@/hooks/useProfessionals";
 import TailwindDatePicker from "@/components/TailwindDatePicker";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop } from "@headlessui/react";
 import type { Appointment } from "./AgendamentosTable";
+import Spinner from "@/components/Spinner";
 
 interface AppointmentSaveData {
   date: Date | null;
@@ -103,7 +104,7 @@ export default function AppointmentEditModal({ isOpen, onClose, appointment, onS
   if (!appointment || !professionals.length) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <span style={{ color: '#000', fontWeight: 500, fontSize: 18 }}>Carregando...</span>
+        <div className="p-8 text-center"><Spinner /></div>
       </div>
     );
   }

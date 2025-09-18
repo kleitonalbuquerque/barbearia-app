@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import Spinner from "@/components/Spinner";
 
 export default function NovoServicoPage() {
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
@@ -55,7 +56,7 @@ export default function NovoServicoPage() {
   }
 
   if (authLoading) {
-    return <div className="p-8 text-center">Carregando...</div>;
+    return <div className="p-8 text-center"><Spinner /></div>;
   }
   if (!isAuthenticated) {
     return <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ServicesTable from "@/components/ServicesTable";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/Spinner";
 
 interface ServiceType {
   id: string;
@@ -89,7 +90,7 @@ export default function ServicosPage() {
         </button>
       </div>
       {loading ? (
-        <p className="text-gray-300">Carregando...</p>
+        <div className="p-8 text-center"><Spinner /></div>
       ) : (
         <>
           <ServicesTable services={services} />

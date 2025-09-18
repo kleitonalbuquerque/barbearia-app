@@ -3,6 +3,7 @@
 import React, { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import dayjs from "dayjs";
 import { useAuth } from "@/contexts/AuthContext";
+import Spinner from "@/components/Spinner";
 
 type AdminUser = {
   id: string;
@@ -71,7 +72,7 @@ export default function UsuariosTenantPage() {
 
   let content;
   if (authLoading || loading) {
-    content = <div className="p-8 text-center text-gray-700 dark:text-gray-100">Carregando...</div>;
+    content = <div className="p-8 text-center"><Spinner /></div>;
   } else if (!isAuthenticated) {
     content = <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
   } else if (error) {

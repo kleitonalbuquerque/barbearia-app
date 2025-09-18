@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     if (clientFull?.email) {
       await sendMail({
         to: clientFull.email,
-        subject: 'Confirmação de Agendamento - Barbearia',
+        subject: 'Confirmação de Agendamento',
         text: msg,
         html: msgHtml
       });

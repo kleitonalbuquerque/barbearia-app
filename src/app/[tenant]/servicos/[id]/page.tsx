@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import Spinner from "@/components/Spinner";
 
 interface ServiceType {
   id: string;
@@ -94,7 +95,7 @@ export default function ServicoDetalhePage() {
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Carregando...</div>;
+  if (loading) return <div className="p-8 text-center"><Spinner /></div>;
   if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
   if (!service) return <div className="p-8 text-center">Serviço não encontrado.</div>;
 
