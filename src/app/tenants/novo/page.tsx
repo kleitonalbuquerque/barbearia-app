@@ -1,5 +1,5 @@
-type NichoKey = 'barbearia' | 'clinica';
 "use client";
+type NichoKey = 'barbearia' | 'clinica';
 import React, { useState } from "react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useRouter } from "next/navigation";
