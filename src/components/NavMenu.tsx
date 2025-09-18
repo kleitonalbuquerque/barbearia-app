@@ -130,7 +130,7 @@ export default function NavMenu() {
                 </button>
                 {adminDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50 animate-fade-in">
-                    <Link href="/usuarios" className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Gerenciar Usuários</Link>
+                    <Link href={`/${tenant}/usuarios`} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Gerenciar Usuários</Link>
                     <Link href={`/${tenant}/financeiro`} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setAdminDropdownOpen(false)}>Financeiro</Link>
                     <button className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => { setAdminDropdownOpen(false); logout(); router.push("/login"); }}>Sair</button>
                   </div>
@@ -188,7 +188,7 @@ export default function NavMenu() {
           {isAuthenticated ? (
             <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
               <span className="block text-xs text-gray-500 dark:text-gray-400 mb-2">Admin</span>
-              <Link href="/usuarios" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
+              <Link href={`/${tenant}/usuarios`} className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Gerenciar Usuários</Link>
               <Link href="/admin/configuracoes" className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">Configurações</Link>
               <button className="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded" onClick={() => { logout(); setDrawerOpen(false); router.push("/login"); }}>Sair</button>
             </div>
