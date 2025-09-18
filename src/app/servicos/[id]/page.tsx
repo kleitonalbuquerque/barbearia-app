@@ -79,6 +79,11 @@ export default function ServicoDetalhePage() {
           priceCents: String(data.service.priceCents),
           durationMinutes: String(data.service.durationMinutes),
         });
+        // Extrai o tenant da URL: /[tenant]/servicos/[id]
+        const tenantFromUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/${tenantFromUrl}/servicos`;
+        }, 1200);
       } else {
         setError((data && data.error) || "Erro ao atualizar serviço.");
         if (data && data.error) console.error("API error:", data.error);

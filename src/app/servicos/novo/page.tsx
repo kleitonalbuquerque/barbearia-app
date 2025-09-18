@@ -45,7 +45,9 @@ export default function NovoServicoPage() {
       setSaving(false);
       if (data.success) {
         setSuccess("Serviço criado com sucesso!");
-        router.push("/servicos");
+        // Extrai o tenant da URL: /[tenant]/servicos/novo
+        const tenantFromUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+        router.push(`/${tenantFromUrl}/servicos`);
       } else {
         setError(data.error || "Erro ao criar serviço.");
       }
