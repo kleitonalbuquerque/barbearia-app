@@ -66,7 +66,7 @@ function getColumns(context: "client" | "professional" = "professional", onEditC
         const data = new Date(appt.startAt);
         return data.toLocaleDateString("pt-BR");
       },
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
+  className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 whitespace-nowrap",
     },
     {
       key: "hora",
@@ -75,7 +75,7 @@ function getColumns(context: "client" | "professional" = "professional", onEditC
         const data = new Date(appt.startAt);
         return data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       },
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
+  className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 whitespace-nowrap",
     },
     {
       key: "servicos",
@@ -84,7 +84,7 @@ function getColumns(context: "client" | "professional" = "professional", onEditC
         appt.items && appt.items.length > 0
           ? appt.items.map((item) => item.serviceType?.name || "-").join(", ")
           : "-",
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
+  className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 whitespace-nowrap",
     },
     context === "professional"
       ? {
@@ -106,7 +106,7 @@ function getColumns(context: "client" | "professional" = "professional", onEditC
         const status = traduzirStatus(appt.status);
         return <span className={`font-bold ${getStatusColor(status)}`}>{status}</span>;
       },
-      className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 font-semibold whitespace-nowrap",
+  className: "px-4 py-3 bg-gray-100 dark:bg-gray-800 text-left text-gray-800 dark:text-gray-200 whitespace-nowrap",
     },
     {
       key: "valor",

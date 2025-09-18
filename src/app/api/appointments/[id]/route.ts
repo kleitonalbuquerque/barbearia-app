@@ -13,7 +13,11 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   try {
     const appointment = await prisma.appointment.findUnique({
       where: { id: params.id },
-      include: { items: true }
+      include: {
+        items: { include: { serviceType: true } },
+        client: { select: { id: true, name: true } },
+        professional: { select: { id: true, name: true } }
+      }
     });
     if (!appointment) {
       return NextResponse.json({ success: false, message: 'Agendamento não encontrado' }, { status: 404 });

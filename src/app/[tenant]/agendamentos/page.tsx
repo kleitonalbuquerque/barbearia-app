@@ -2,6 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AgendamentosTable from "@/components/AgendamentosTable";
+import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
 import AgendamentoModal from "@/components/agendamentos/AgendamentoModal";
@@ -20,6 +21,7 @@ interface Client { id: string; name: string; }
 interface ServiceType { id: string; name: string; priceCents: number; }
 
 export default function AgendamentosPage() {
+  const router = useRouter();
   const { fetchAuthed, loading: authLoading, isAuthenticated } = useAuth();
   // Extrai o tenant da URL: /[tenant]/agendamentos
   const tenant = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
@@ -114,7 +116,10 @@ export default function AgendamentosPage() {
       })),
     }));
     content = (
-      <AgendamentosTable appointments={appointmentsAdapted} />
+      <AgendamentosTable
+        appointments={appointmentsAdapted}
+        onRowClick={(appt) => router.push(`/${tenant}/agendamentos/${appt.id}`)}
+      />
     );
   }
 
