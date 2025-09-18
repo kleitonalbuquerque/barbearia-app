@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import dayjs from "dayjs";
 import { useAuth } from "@/contexts/AuthContext";
 
 type AdminUser = {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  createdAt?: string;
+  created_at?: string;
 };
 
 export default function UsuariosPage() {
@@ -20,9 +22,12 @@ export default function UsuariosPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
 
+  // Detecta o tenant/subdomínio pela URL
+  const params = typeof window !== "undefined" ? window.location.pathname.split("/") : [];
+  const tenant = params.length > 1 ? params[1] : "";
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      fetchAuthed("/api/users")
+    if (!authLoading && isAuthenticated && tenant) {
+      fetchAuthed(`/api/users?tenantId=${tenant}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) setUsers(data.users);
@@ -31,7 +36,7 @@ export default function UsuariosPage() {
         .catch(() => setError("Erro ao carregar usuários"))
         .finally(() => setLoading(false));
     }
-  }, [fetchAuthed, success, authLoading, isAuthenticated]);
+  }, [fetchAuthed, success, authLoading, isAuthenticated, tenant]);
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -65,7 +70,7 @@ export default function UsuariosPage() {
 
   let content;
   if (authLoading || loading) {
-    content = <div className="p-8 text-center">Carregando...</div>;
+    content = <div className="flex justify-center items-center p-8"><span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></span></div>;
   } else if (!isAuthenticated) {
     content = <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
   } else if (error) {
@@ -81,13 +86,27 @@ export default function UsuariosPage() {
           </tr>
         </thead>
         <tbody>
-          {users.map((u) => (
-            <tr key={u.id} className="border-t border-gray-200 dark:border-gray-700">
-              <td className="p-3">{u.name}</td>
-              <td className="p-3">{u.email}</td>
-              <td className="p-3">{new Date(u.createdAt).toLocaleString()}</td>
+          {Array.isArray(users) && users.length > 0 ? users.map((u) => {
+            let dateStr = '-';
+            if (u.created_at) {
+              const formatted = dayjs(u.created_at).isValid() ? dayjs(u.created_at).format('DD/MM/YYYY HH:mm') : '-';
+              dateStr = formatted;
+            } else if (u.createdAt) {
+              const formatted = dayjs(u.createdAt).isValid() ? dayjs(u.createdAt).format('DD/MM/YYYY HH:mm') : '-';
+              dateStr = formatted;
+            }
+            return (
+              <tr key={u.id} className="border-t border-gray-200 dark:border-gray-700">
+                <td className="p-3">{u.name}</td>
+                <td className="p-3">{u.email}</td>
+                <td className="p-3">{dateStr}</td>
+              </tr>
+            );
+          }) : (
+            <tr>
+              <td colSpan={3} className="p-3 text-center text-gray-500">Nenhum usuário encontrado</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     );

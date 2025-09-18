@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import dayjs from "dayjs";
 import { useAuth } from "@/contexts/AuthContext";
 
 type AdminUser = {
   id: string;
   name: string;
   email: string;
-  createdAt: string;
+  createdAt?: string;
+  created_at?: string;
 };
 
 export default function UsuariosTenantPage() {
@@ -45,10 +47,12 @@ export default function UsuariosTenantPage() {
     setError("");
     setSuccess("");
     try {
+      // Adiciona o tenant/subdomínio ao corpo da requisição
+      const payload = { ...form, tenantId: tenant };
       const res = await fetchAuthed("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       setSaving(false);
@@ -83,13 +87,27 @@ export default function UsuariosTenantPage() {
           </tr>
         </thead>
         <tbody>
-          {users.map((u) => (
-            <tr key={u.id} className="border-t border-gray-200 dark:border-gray-700">
-              <td className="p-3 text-gray-700 dark:text-gray-100">{u.name}</td>
-              <td className="p-3 text-gray-700 dark:text-gray-100">{u.email}</td>
-              <td className="p-3 text-gray-700 dark:text-gray-100">{new Date(u.createdAt).toLocaleString()}</td>
+          {Array.isArray(users) && users.length > 0 ? users.map((u) => {
+            let dateStr = '-';
+            if (u.created_at) {
+              const formatted = dayjs(u.created_at).isValid() ? dayjs(u.created_at).format('DD/MM/YYYY HH:mm') : '-';
+              dateStr = formatted;
+            } else if (u.createdAt) {
+              const formatted = dayjs(u.createdAt).isValid() ? dayjs(u.createdAt).format('DD/MM/YYYY HH:mm') : '-';
+              dateStr = formatted;
+            }
+            return (
+              <tr key={u.id} className="border-t border-gray-200 dark:border-gray-700">
+                <td className="p-3 text-gray-700 dark:text-gray-100">{u.name}</td>
+                <td className="p-3 text-gray-700 dark:text-gray-100">{u.email}</td>
+                <td className="p-3 text-gray-700 dark:text-gray-100">{dateStr}</td>
+              </tr>
+            );
+          }) : (
+            <tr>
+              <td colSpan={3} className="p-3 text-center text-gray-500">Nenhum usuário encontrado</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     );

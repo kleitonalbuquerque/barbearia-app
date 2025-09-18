@@ -21,6 +21,7 @@
     "bcryptjs": "^3.0.2",
     "chart.js": "^4.5.0",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.18",
     "jsonwebtoken": "^9.0.2",
     "next": "15.5.2",
     "next-auth": "^4.24.11",
