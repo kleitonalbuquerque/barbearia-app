@@ -2,6 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AgendamentosTable from "@/components/AgendamentosTable";
+import Spinner from "@/components/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
 import AgendamentoModal from "@/components/agendamentos/AgendamentoModal";
 
@@ -95,7 +96,7 @@ export default function AgendamentosPage() {
 
   let content;
   if (authLoading || loading) {
-    content = <div className="p-8 text-center text-gray-300">Carregando...</div>;
+    content = <div className="p-8 text-center"><Spinner /></div>;
   } else if (error) {
     content = <div className="p-8 text-center text-red-600">{error}</div>;
   } else {

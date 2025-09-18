@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import Spinner from "@/components/Spinner";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
@@ -190,7 +191,7 @@ export default function FinanceiroPage() {
       </div>
       <div className="mb-8 min-h-[100px] flex items-center justify-center">
         {loading ? (
-          <div className="flex items-center gap-2"><span className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-600"></span> Carregando...</div>
+          <Spinner />
         ) : (
           <div style={{ background: '#fff', borderRadius: 12, padding: 16, width: '100%' }}>
             <Bar

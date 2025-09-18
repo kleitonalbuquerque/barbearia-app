@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useParams, useRouter } from "next/navigation";
 import AgendamentosTable from "@/components/AgendamentosTable";
+import Spinner from "@/components/Spinner";
 
 interface Client {
   id: string;
@@ -146,7 +147,11 @@ export default function ClienteDetalhePage() {
 
   let conteudo;
   if (loading) {
-    conteudo = <p>Carregando...</p>;
+    conteudo = (
+      <div className="flex items-center justify-center py-12">
+        <Spinner />
+      </div>
+    );
   } else if (client) {
     conteudo = (
       <>

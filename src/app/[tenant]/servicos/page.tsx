@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ServicesTable from "@/components/ServicesTable";
+import Spinner from "@/components/Spinner";
 import { useRouter } from "next/navigation";
 
 interface ServiceType {
@@ -82,47 +83,53 @@ export default function ServicosPage() {
           <option value="asc">Asc</option>
         </select>
       </div>
-      <ServicesTable services={services} />
-      {/* Paginação */}
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <span className="text-gray-900 dark:text-white">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <button
-            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
-            onClick={() => setPage(1)}
-            disabled={page === 1}
-          >Início</button>
-          <button
-            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >Anterior</button>
-          <button
-            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
-            onClick={() => setPage(p => p + 1)}
-            disabled={page >= Math.ceil(total / pageSize)}
-          >Próxima</button>
-          <button
-            className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
-            onClick={() => setPage(Math.max(1, Math.ceil(total / pageSize)))}
-            disabled={page >= Math.ceil(total / pageSize)}
-          >Última</button>
-          <select
-            className="ml-2 p-1 border rounded bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-            value={pageSize}
-            onChange={e => {
-              setPageSize(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            {[5, 10, 20, 50].map(size => (
-              <option key={size} value={size} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{size} por página</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          <ServicesTable services={services} />
+          {/* Paginação */}
+          <div className="flex items-center justify-between mt-4">
+            <div>
+              <span className="text-gray-900 dark:text-white">Página {page} de {Math.max(1, Math.ceil(total / pageSize))}</span>
+            </div>
+            <div className="flex gap-2 items-center">
+              <button
+                className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+              >Início</button>
+              <button
+                className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >Anterior</button>
+              <button
+                className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(p => p + 1)}
+                disabled={page >= Math.ceil(total / pageSize)}
+              >Próxima</button>
+              <button
+                className="px-3 py-1 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-200 transition"
+                onClick={() => setPage(Math.max(1, Math.ceil(total / pageSize)))}
+                disabled={page >= Math.ceil(total / pageSize)}
+              >Última</button>
+              <select
+                className="ml-2 p-1 border rounded bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                value={pageSize}
+                onChange={e => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                {[5, 10, 20, 50].map(size => (
+                  <option key={size} value={size} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100">{size} por página</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
