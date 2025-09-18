@@ -1,3 +1,15 @@
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    if (!id || !isValidUUID(id)) {
+      return NextResponse.json({ success: false, error: 'ID inválido.' }, { status: 400 });
+    }
+    await prisma.serviceType.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+  }
+}
 function isValidUUID(uuid: string) {
   return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(uuid);
 }

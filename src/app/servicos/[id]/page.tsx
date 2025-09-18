@@ -23,6 +23,8 @@ export default function ServicoDetalhePage() {
   const [success, setSuccess] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!serviceId) return;
@@ -95,13 +97,61 @@ export default function ServicoDetalhePage() {
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await fetchAuthed(`/api/services/${serviceId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setDeleting(false);
+      if (data.success) {
+        // Extrai o tenant da URL: /[tenant]/servicos/[id]
+        const tenantFromUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+        window.location.href = `${window.location.origin}/${tenantFromUrl}/servicos`;
+      } else {
+        setError((data && data.error) || "Erro ao remover serviço.");
+      }
+    } catch (err) {
+      setDeleting(false);
+      setError("Erro ao remover serviço.");
+      console.error("Erro ao remover serviço:", err);
+    }
+  }
+
   if (loading) return <div className="p-8 text-center"><Spinner /></div>;
   if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
   if (!service) return <div className="p-8 text-center">Serviço não encontrado.</div>;
 
   return (
     <div className="max-w-lg mx-auto p-4">
-  <h1 className="text-2xl font-bold mb-6 brand-title">Detalhes do Serviço</h1>
+      <h1 className="text-2xl font-bold mb-6 brand-title">Detalhes do Serviço</h1>
+      {/* Modal de confirmação de remoção */}
+      {showDeleteConfirm && (
+  <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded shadow p-6 w-full max-w-sm text-center">
+            <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Confirmar remoção</h2>
+            <p className="mb-6 text-gray-700 dark:text-gray-300">Tem certeza que deseja remover este serviço?</p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white dark:text-white font-semibold px-4 py-2 rounded shadow transition"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Removendo..." : "Remover"}
+              </button>
+              <button
+                className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-blue-800 dark:text-gray-100 font-semibold px-4 py-2 rounded shadow transition"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded shadow p-6 flex flex-col gap-4">
   <label htmlFor="name" className="text-sm font-semibold brand-title">Nome</label>
         <input
@@ -178,6 +228,13 @@ export default function ServicoDetalhePage() {
                 onClick={e => { e.preventDefault(); setEditMode(true); setError(""); setSuccess(""); }}
               >
                 Editar Serviço
+              </button>
+              <button
+                type="button"
+                className="bg-red-600 hover:bg-red-700 text-white dark:text-white font-semibold px-4 py-2 rounded shadow transition"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Remover Serviço
               </button>
               <button
                 type="button"
