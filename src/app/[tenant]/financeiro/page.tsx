@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Spinner from "@/components/Spinner";
+import { useAuth } from "@/contexts/AuthContext";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
@@ -19,6 +20,7 @@ interface Professional {
 }
 
 export default function FinanceiroTenantPage() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [showProfessionalDropdown, setShowProfessionalDropdown] = useState(false);
   const professionalDropdownRef = useRef<HTMLDivElement>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -32,13 +34,13 @@ export default function FinanceiroTenantPage() {
   const params = typeof window !== "undefined" ? window.location.pathname.split("/") : [];
   const tenant = params.length > 1 ? params[1] : "";
   useEffect(() => {
-    if (!tenant) return;
+    if (!tenant || !isAuthenticated || authLoading) return;
     fetch(`/api/professionals?tenantId=${tenant}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) setProfessionals(data.professionals);
       });
-  }, [tenant]);
+  }, [tenant, isAuthenticated, authLoading]);
 
   // Busca dados apenas ao clicar no botão
   const handleGenerate = () => {
@@ -113,6 +115,12 @@ export default function FinanceiroTenantPage() {
     URL.revokeObjectURL(url);
   }
 
+  if (authLoading) {
+    return <div className="p-8 text-center"><Spinner /></div>;
+  }
+  if (!isAuthenticated) {
+    return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
+  }
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 md:px-8 py-8">
       <h1 className="text-2xl font-bold mb-6 brand-title">Financeiro</h1>

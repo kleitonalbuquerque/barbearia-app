@@ -71,10 +71,12 @@ export default function UsuariosTenantPage() {
   }
 
   let content;
-  if (authLoading || loading) {
+  if (authLoading) {
     content = <div className="p-8 text-center"><Spinner /></div>;
   } else if (!isAuthenticated) {
-    content = <div className="p-8 text-center text-red-600">Acesso restrito. Faça login como admin.</div>;
+    content = <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
+  } else if (loading) {
+    content = <div className="p-8 text-center"><Spinner /></div>;
   } else if (error) {
     content = <div className="p-8 text-center text-red-600">{error}</div>;
   } else {

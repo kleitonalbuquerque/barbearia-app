@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Spinner from "@/components/Spinner";
+import { useAuth } from "@/contexts/AuthContext";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
@@ -31,15 +32,17 @@ export default function FinanceiroPage() {
   const [endDate, setEndDate] = useState("");
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [selectedProfessionals, setSelectedProfessionals] = useState<string[]>([]); // array de ids
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   // Carrega profissionais para o filtro
   useEffect(() => {
+    if (!isAuthenticated || authLoading) return;
     fetch("/api/professionals")
       .then(res => res.json())
       .then(data => {
         if (data.success) setProfessionals(data.professionals);
       });
-  }, []);
+  }, [isAuthenticated, authLoading]);
 
   // Busca dados apenas ao clicar no botão
   const handleGenerate = () => {
@@ -114,10 +117,16 @@ export default function FinanceiroPage() {
     URL.revokeObjectURL(url);
   }
 
+  if (authLoading) {
+    return <div className="p-8 text-center"><Spinner /></div>;
+  }
+  if (!isAuthenticated) {
+    return <div className="p-8 text-center text-red-600 font-bold">Você precisa estar logado para acessar esta página.</div>;
+  }
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 md:px-8 py-8">
-  <h1 className="text-2xl font-bold mb-6 brand-title">Financeiro</h1>
-  <div className="flex flex-wrap gap-4 mb-6 items-end">
+      <h1 className="text-2xl font-bold mb-6 brand-title">Financeiro</h1>
+      <div className="flex flex-wrap gap-4 mb-6 items-end">
         <div>
           <label className="block text-sm font-semibold mb-1" htmlFor="start-date">Data início</label>
           <input id="start-date" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="p-2 border rounded w-full bg-white text-gray-900" />
